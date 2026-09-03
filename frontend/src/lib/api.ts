@@ -1,3 +1,4 @@
+import { Report, ReportFormData } from '@/types/report';
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export async function apiFetch(path: string, options: RequestInit = {}) {
@@ -38,4 +39,31 @@ export const projectsApi = {
     apiFetch(`/projects/${id}`, { method: 'PUT', body: JSON.stringify({ name }) }),
   remove: (id: string): Promise<void> =>
     apiFetch(`/projects/${id}`, { method: 'DELETE' }),
+};
+
+export const reportsApi = {
+  create: (data: ReportFormData): Promise<Report> =>
+    apiFetch('/reports', { method: 'POST', body: JSON.stringify(data) }),
+
+  getOne: (id: string): Promise<Report> => apiFetch(`/reports/${id}`),
+
+  update: (id: string, data: ReportFormData): Promise<Report> =>
+    apiFetch(`/reports/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+
+  submit: (id: string): Promise<Report> =>
+    apiFetch(`/reports/${id}/submit`, { method: 'POST' }),
+
+  listMine: (params?: { status?: string; page?: number; pageSize?: number }) => {
+    const query = new URLSearchParams();
+    if (params?.status) query.set('status', params.status);
+    if (params?.page) query.set('page', String(params.page));
+    if (params?.pageSize) query.set('pageSize', String(params.pageSize));
+    const qs = query.toString();
+    return apiFetch(`/reports${qs ? `?${qs}` : ''}`) as Promise<{
+      reports: Report[];
+      total: number;
+      page: number;
+      pageSize: number;
+    }>;
+  },
 };
