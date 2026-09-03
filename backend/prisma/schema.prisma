@@ -1,15 +1,172 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  TEAM_MEMBER
+  MANAGER
+  ADMIN
+}
+
+enum ReportStatus {
+  DRAFT
+  SUBMITTED
+  NEEDS_CORRECTION
+  APPROVED
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum HighlightType {
+  BLOCKER
+  ACHIEVEMENT
+}
+
+enum ReviewDecision {
+  APPROVED
+  NEEDS_CORRECTION
+}
+
+model User {
+  id            String    @id @default(uuid())
+  name          String
+  email         String    @unique
+  passwordHash  String
+  role          Role      @default(TEAM_MEMBER)
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+
+  reports          Report[]         @relation("UserReports")
+  projectMembers   ProjectMember[]
+  reviewsGiven     ReviewComment[]  @relation("ManagerReviews")
+
+  @@map("users")
+}
+
+model Project {
+  id        String    @id @default(uuid())
+  name      String
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+
+  reports         Report[]
+  projectMembers  ProjectMember[]
+
+  @@map("projects")
+}
+
+model ProjectMember {
+  id        String   @id @default(uuid())
+  projectId String
+  userId    String
+
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+  @@map("project_members")
+}
+
+model Report {
+  id              String        @id @default(uuid())
+  userId          String
+  projectId       String
+  weekStartDate   DateTime
+  status          ReportStatus  @default(DRAFT)
+  tasksNextWeek   String?
+  notesLinks      String?
+  currentVersion  Int           @default(0)
+  createdAt       DateTime      @default(now())
+  submittedAt     DateTime?
+  approvedAt      DateTime?
+  updatedAt       DateTime      @updatedAt
+
+  user            User               @relation("UserReports", fields: [userId], references: [id])
+  project         Project            @relation(fields: [projectId], references: [id])
+  tasks           ReportTask[]
+  highlights      ReportHighlight[]
+  hoursBreakdown  HoursBreakdown[]
+  versions        ReportVersion[]
+  reviewComments  ReviewComment[]
+
+  @@unique([userId, weekStartDate])
+  @@map("reports")
+}
+
+model ReportTask {
+  id              String    @id @default(uuid())
+  reportId        String
+  taskName        String
+  priority        Priority
+  plannedPct      Int
+  actualPct       Int
+  status          String
+  timePlannedHrs  Decimal
+  timeSpentHrs    Decimal
+  deliverable     String?
+
+  report          Report    @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@map("report_tasks")
+}
+
+model ReportHighlight {
+  id           String         @id @default(uuid())
+  reportId     String
+  itemType     HighlightType
+  description  String
+  isKeyItem    Boolean        @default(false)
+
+  report       Report         @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@map("report_highlights")
+}
+
+model HoursBreakdown {
+  id            String   @id @default(uuid())
+  reportId      String
+  taskCategory  String
+  hoursSpent    Decimal
+
+  report        Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@map("hours_breakdown")
+}
+
+model ReportVersion {
+  id               String    @id @default(uuid())
+  reportId         String
+  versionNumber    Int
+  contentSnapshot  Json
+  submittedAt      DateTime  @default(now())
+
+  report           Report          @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  reviewComments   ReviewComment[]
+
+  @@unique([reportId, versionNumber])
+  @@map("report_versions")
+}
+
+model ReviewComment {
+  id           String          @id @default(uuid())
+  reportId     String
+  versionId    String
+  managerId    String
+  decision     ReviewDecision
+  commentText  String?
+  createdAt    DateTime        @default(now())
+
+  report       Report          @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  version      ReportVersion   @relation(fields: [versionId], references: [id])
+  manager      User            @relation("ManagerReviews", fields: [managerId], references: [id])
+
+  @@map("review_comments")
 }
