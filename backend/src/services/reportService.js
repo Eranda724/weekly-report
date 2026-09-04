@@ -100,6 +100,12 @@ async function updateReport(reportId, userId, data) {
         hoursBreakdown = [],
     } = data;
 
+    // Strip out id/reportId — Prisma's nested create infers reportId automatically,
+    // and we always want fresh child rows, not to reuse old ids.
+    const cleanTasks = tasks.map(({ id, reportId, ...rest }) => rest);
+    const cleanHighlights = highlights.map(({ id, reportId, ...rest }) => rest);
+    const cleanHours = hoursBreakdown.map(({ id, reportId, ...rest }) => rest);
+
     return prisma.$transaction(async (tx) => {
         // Replace child rows entirely — simplest correct approach for a fixed-structure form
         await tx.reportTask.deleteMany({ where: { reportId } });
@@ -113,9 +119,9 @@ async function updateReport(reportId, userId, data) {
                 weekStartDate: new Date(weekStartDate),
                 tasksNextWeek,
                 notesLinks,
-                tasks: { create: tasks.map((t) => ({ ...t })) },
-                highlights: { create: highlights.map((h) => ({ ...h })) },
-                hoursBreakdown: { create: hoursBreakdown.map((hb) => ({ ...hb })) },
+                tasks: { create: cleanTasks },
+                highlights: { create: cleanHighlights },
+                hoursBreakdown: { create: cleanHours },
             },
             include: { tasks: true, highlights: true, hoursBreakdown: true },
         });
@@ -179,10 +185,81 @@ async function listMyReports(userId, filters = {}) {
     return { reports, total, page, pageSize };
 }
 
+//Review & Correction Workflow
+async function reviewReport(reportId, managerId, { decision, commentText }) {
+    const report = await prisma.report.findUnique({ where: { id: reportId } });
+
+    if (!report) throw new Error('Report not found');
+    if (report.status !== 'SUBMITTED') {
+        throw new Error('Only submitted reports can be reviewed');
+    }
+    if (decision === 'NEEDS_CORRECTION' && !commentText) {
+        throw new Error('A comment is required when requesting changes');
+    }
+
+    const latestVersion = await prisma.reportVersion.findFirst({
+        where: { reportId },
+        orderBy: { versionNumber: 'desc' },
+    });
+
+    if (!latestVersion) throw new Error('No submitted version found for this report');
+
+    return prisma.$transaction(async (tx) => {
+        await tx.reviewComment.create({
+            data: {
+                reportId,
+                versionId: latestVersion.id,
+                managerId,
+                decision,
+                commentText: commentText || null,
+            },
+        });
+
+        const updated = await tx.report.update({
+            where: { id: reportId },
+            data: {
+                status: decision === 'APPROVED' ? 'APPROVED' : 'NEEDS_CORRECTION',
+                approvedAt: decision === 'APPROVED' ? new Date() : report.approvedAt,
+            },
+        });
+
+        return updated;
+    });
+}
+
+async function listAllReports(requestingUser, filters = {}) {
+    if (!['MANAGER', 'ADMIN'].includes(requestingUser.role)) {
+        throw new Error('Forbidden');
+    }
+
+    const { userId, projectId, status, weekStartDate, page = 1, pageSize = 10 } = filters;
+
+    const where = {
+        ...(userId ? { userId } : {}),
+        ...(projectId ? { projectId } : {}),
+        ...(status ? { status } : {}),
+        ...(weekStartDate ? { weekStartDate: new Date(weekStartDate) } : {}),
+    };
+
+    const [reports, total] = await Promise.all([
+        prisma.report.findMany({
+            where,
+            orderBy: { weekStartDate: 'desc' },
+            skip: (page - 1) * pageSize,
+            take: pageSize,
+            include: { project: true, user: { select: { id: true, name: true, email: true } } },
+        }),
+        prisma.report.count({ where }),
+    ]);
+
+    return { reports, total, page, pageSize };
+}
+
 module.exports = {
     createDraftReport,
     getReportById,
     updateReport,
     submitReport,
-    listMyReports,
+    reviewReport,
+    listAllReports,
 };

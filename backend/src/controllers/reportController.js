@@ -3,7 +3,8 @@ const {
     getReportById,
     updateReport,
     submitReport,
-    listMyReports,
+    reviewReport,
+    listAllReports,
 } = require('../services/reportService');
 
 async function create(req, res) {
@@ -62,4 +63,35 @@ async function listMine(req, res) {
     }
 }
 
-module.exports = { create, getOne, update, submit, listMine };
+// review and correction workflow
+async function review(req, res) {
+    try {
+        const { decision, commentText } = req.body;
+        if (!['APPROVED', 'NEEDS_CORRECTION'].includes(decision)) {
+            return res.status(400).json({ error: 'decision must be APPROVED or NEEDS_CORRECTION' });
+        }
+        const report = await reviewReport(req.params.id, req.user.id, { decision, commentText });
+        res.json(report);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+}
+
+async function listAll(req, res) {
+    try {
+        const { userId, projectId, status, weekStartDate, page, pageSize } = req.query;
+        const result = await listAllReports(req.user, {
+            userId, projectId, status, weekStartDate,
+            page: page ? Number(page) : undefined,
+            pageSize: pageSize ? Number(pageSize) : undefined,
+        });
+        res.json(result);
+    } catch (err) {
+        const status = err.message === 'Forbidden' ? 403 : 400;
+        res.status(status).json({ error: err.message });
+    }
+}
+
+module.exports = {
+    create, getOne, update, submit, listMine, review, listAll,
+};

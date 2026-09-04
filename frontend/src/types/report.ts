@@ -46,7 +46,7 @@ export type Report = ReportFormData & {
     approvedAt: string | null;
     project?: { id: string; name: string };
     user?: { id: string; name: string; email: string };
-    versions?: { id: string; versionNumber: number; submittedAt: string }[];
+    versions?: { id: string; versionNumber: number; submittedAt: string; contentSnapshot: string }[];
     reviewComments?: {
         id: string;
         decision: string;

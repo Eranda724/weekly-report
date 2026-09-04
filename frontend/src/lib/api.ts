@@ -67,3 +67,37 @@ export const reportsApi = {
     }>;
   },
 };
+
+
+//review and correction workflow
+export const managerReportsApi = {
+  listAll: (params?: {
+    userId?: string;
+    projectId?: string;
+    status?: string;
+    weekStartDate?: string;
+    page?: number;
+    pageSize?: number;
+  }) => {
+    const query = new URLSearchParams();
+    if (params?.userId) query.set('userId', params.userId);
+    if (params?.projectId) query.set('projectId', params.projectId);
+    if (params?.status) query.set('status', params.status);
+    if (params?.weekStartDate) query.set('weekStartDate', params.weekStartDate);
+    if (params?.page) query.set('page', String(params.page));
+    if (params?.pageSize) query.set('pageSize', String(params.pageSize));
+    const qs = query.toString();
+    return apiFetch(`/reports/team/all${qs ? `?${qs}` : ''}`) as Promise<{
+      reports: Report[];
+      total: number;
+      page: number;
+      pageSize: number;
+    }>;
+  },
+
+  review: (id: string, decision: 'APPROVED' | 'NEEDS_CORRECTION', commentText?: string): Promise<Report> =>
+    apiFetch(`/reports/${id}/review`, {
+      method: 'POST',
+      body: JSON.stringify({ decision, commentText }),
+    }),
+};
