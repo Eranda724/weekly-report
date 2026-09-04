@@ -73,6 +73,11 @@ export default function DashboardPage() {
                 <div className="flex justify-between items-center mb-6">
                     <h1 className="text-2xl font-semibold">Team Dashboard</h1>
                     <div className="flex items-center gap-4">
+                        {user?.role === 'ADMIN' && (
+                            <Link href="/admin/users" className="text-sm text-purple-600 hover:underline font-medium">
+                                Manage Users
+                            </Link>
+                        )}
                         <span className="text-sm text-gray-500">{user?.name} ({user?.role})</span>
                         <button onClick={logout} className="text-sm text-red-600 hover:underline">Log Out</button>
                     </div>
@@ -164,7 +169,10 @@ export default function DashboardPage() {
                             <div key={report.id} className="flex justify-between items-center p-4">
                                 <div>
                                     <p className="font-medium">
-                                        {report.user?.name} · Week of {new Date(report.weekStartDate).toLocaleDateString()}
+                                        <Link href={`/profile/${report.user?.id}`} className="hover:underline text-blue-700">
+                                            {report.user?.name}
+                                        </Link>
+                                        {' '}· Week of {new Date(report.weekStartDate).toLocaleDateString()}
                                     </p>
                                     <p className="text-sm text-gray-500">{report.project?.name}</p>
                                 </div>

@@ -108,3 +108,24 @@ export type BasicUser = { id: string; name: string; email: string };
 export const usersApi = {
   list: (): Promise<BasicUser[]> => apiFetch('/users'),
 };
+
+export type AdminUser = {
+  id: string;
+  name: string;
+  email: string;
+  role: 'TEAM_MEMBER' | 'MANAGER' | 'ADMIN';
+  isActive: boolean;
+  createdAt: string;
+};
+
+export const usersAdminApi = {
+  listAll: (): Promise<AdminUser[]> => apiFetch('/users/admin/all'),
+  create: (data: { name: string; email: string; password: string; role: string }): Promise<AdminUser> =>
+    apiFetch('/users/admin/create', { method: 'POST', body: JSON.stringify(data) }),
+  updateRole: (id: string, role: string): Promise<AdminUser> =>
+    apiFetch(`/users/admin/${id}/role`, { method: 'PUT', body: JSON.stringify({ role }) }),
+  deactivate: (id: string): Promise<AdminUser> =>
+    apiFetch(`/users/admin/${id}/deactivate`, { method: 'PUT' }),
+  reactivate: (id: string): Promise<AdminUser> =>
+    apiFetch(`/users/admin/${id}/reactivate`, { method: 'PUT' }),
+};
