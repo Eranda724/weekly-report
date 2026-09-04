@@ -5,6 +5,7 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import { useAuth } from '@/context/AuthContext';
 import { managerReportsApi, projectsApi, usersApi, Project, BasicUser } from '@/lib/api';
 import { Report } from '@/types/report';
+import DashboardInsights from '@/components/dashboard/DashboardInsights';
 
 const statusColors: Record<string, string> = {
     DRAFT: 'bg-gray-200 text-gray-800',
@@ -200,6 +201,8 @@ export default function DashboardPage() {
                         ))}
                     </div>
                 )}
+                
+                <DashboardInsights weekStartDate={filters.weekStartDate || undefined} />
             </main>
         </ProtectedRoute>
     );

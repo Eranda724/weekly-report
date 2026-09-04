@@ -129,3 +129,24 @@ export const usersAdminApi = {
   reactivate: (id: string): Promise<AdminUser> =>
     apiFetch(`/users/admin/${id}/reactivate`, { method: 'PUT' }),
 };
+
+//charts
+export type DashboardMetrics = {
+  summary: {
+    weekStartDate: string;
+    totalSubmittedThisWeek: number;
+    complianceRate: { submitted: number; pending: number; late: number };
+    needsCorrectionCount: number;
+    openBlockersCount: number;
+  };
+  trend: { weekStartDate: string; completedTasks: number }[];
+  statusByMember: { userId: string; name: string; status: string }[];
+  workloadByProject: { project: string; taskCount: number }[];
+  timeByTaskType: { taskCategory: string; hours: number }[];
+  activityFeed: { type: string; timestamp: string; text: string; reportId: string }[];
+};
+
+export const dashboardApi = {
+  getMetrics: (weekStartDate?: string): Promise<DashboardMetrics> =>
+    apiFetch(`/dashboard/metrics${weekStartDate ? `?weekStartDate=${weekStartDate}` : ''}`),
+};
