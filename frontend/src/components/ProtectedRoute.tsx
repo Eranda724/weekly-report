@@ -8,12 +8,16 @@ type Props = {
     allowedRoles?: ('TEAM_MEMBER' | 'MANAGER' | 'ADMIN')[];
 };
 
+function homeRouteFor(role: string) {
+    return role === 'TEAM_MEMBER' ? '/reports' : '/dashboard';
+}
+
 export default function ProtectedRoute({ children, allowedRoles }: Props) {
     const { user, loading } = useAuth();
     const router = useRouter();
 
     useEffect(() => {
-        if (loading) return; // wait until we've checked localStorage
+        if (loading) return;
 
         if (!user) {
             router.replace('/login');
@@ -21,7 +25,7 @@ export default function ProtectedRoute({ children, allowedRoles }: Props) {
         }
 
         if (allowedRoles && !allowedRoles.includes(user.role)) {
-            router.replace('/dashboard'); // logged in, but wrong role
+            router.replace(homeRouteFor(user.role));
         }
     }, [user, loading, allowedRoles, router]);
 
@@ -34,7 +38,7 @@ export default function ProtectedRoute({ children, allowedRoles }: Props) {
     }
 
     if (!user || (allowedRoles && !allowedRoles.includes(user.role))) {
-        return null; // brief flash before redirect completes
+        return null;
     }
 
     return <>{children}</>;

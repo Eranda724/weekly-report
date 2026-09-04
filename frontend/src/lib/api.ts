@@ -101,3 +101,10 @@ export const managerReportsApi = {
       body: JSON.stringify({ decision, commentText }),
     }),
 };
+
+//team dashboard
+export type BasicUser = { id: string; name: string; email: string };
+
+export const usersApi = {
+  list: (): Promise<BasicUser[]> => apiFetch('/users'),
+};
