@@ -33,17 +33,22 @@ async function getSummaryMetrics(weekStartDate) {
     });
 
     const submittedCount = weekReports.filter((r) => r.status !== 'DRAFT').length;
+    const newReportsCount = weekReports.filter((r) => r.status === 'SUBMITTED').length;
     const needsCorrectionCount = weekReports.filter((r) => r.status === 'NEEDS_CORRECTION').length;
+    const acceptedReportsCount = weekReports.filter((r) => r.status === 'APPROVED').length;
+    const draftReportsCount = weekReports.filter((r) => r.status === 'DRAFT').length;
 
     const reportedUserIds = new Set(weekReports.map((r) => r.userId));
     const missingCount = Math.max(activeMembers - reportedUserIds.size, 0);
     const pendingCount = weekHasEnded ? 0 : missingCount;
     const lateCount = weekHasEnded ? missingCount : 0;
 
-    const openBlockersCount = await prisma.reportHighlight.count({
+    const openBlockersCount = await prisma.report.count({
         where: {
-            itemType: 'BLOCKER',
-            report: { status: { not: 'APPROVED' } },
+            status: { not: 'APPROVED' },
+            highlights: {
+                some: { itemType: 'BLOCKER' }
+            }
         },
     });
 
@@ -51,7 +56,10 @@ async function getSummaryMetrics(weekStartDate) {
         weekStartDate: weekStart,
         totalSubmittedThisWeek: submittedCount,
         complianceRate: { submitted: submittedCount, pending: pendingCount, late: lateCount },
+        newReportsCount,
         needsCorrectionCount,
+        acceptedReportsCount,
+        draftReportsCount,
         openBlockersCount,
     };
 }

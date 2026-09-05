@@ -136,7 +136,10 @@ export type DashboardMetrics = {
     weekStartDate: string;
     totalSubmittedThisWeek: number;
     complianceRate: { submitted: number; pending: number; late: number };
+    newReportsCount: number;
     needsCorrectionCount: number;
+    acceptedReportsCount: number;
+    draftReportsCount: number;
     openBlockersCount: number;
   };
   trend: { weekStartDate: string; completedTasks: number }[];

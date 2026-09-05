@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import Sidebar from '@/components/Sidebar';
+import ManagerSidebar from '@/components/ManagerSidebar';
 import { useAuth } from '@/context/AuthContext';
 import { reportsApi } from '@/lib/api';
 import { Report, ReportStatus } from '@/types/report';
@@ -41,9 +42,9 @@ export default function ProfilePage() {
     const initial = user?.name?.[0]?.toUpperCase() ?? '?';
 
     return (
-        <ProtectedRoute allowedRoles={['TEAM_MEMBER']}>
+        <ProtectedRoute>
             <div className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-200 flex">
-                <Sidebar />
+                {user?.role === 'MANAGER' || user?.role === 'ADMIN' ? <ManagerSidebar /> : <Sidebar />}
 
                 <div className="ml-60 flex-1">
                     {/* Page header */}
@@ -94,20 +95,22 @@ export default function ProfilePage() {
                         </div>
 
                         {/* ── Stats strip ── */}
-                        <div className="grid grid-cols-4 gap-3">
-                            {[
-                                { label: 'Total Reports', value: stats.total,     color: 'text-indigo-600 dark:text-indigo-400',   icon: '📋' },
-                                { label: 'Approved',       value: stats.approved,  color: 'text-emerald-600 dark:text-emerald-400', icon: '✅' },
-                                { label: 'Submitted',      value: stats.submitted, color: 'text-violet-600 dark:text-violet-400',   icon: '📤' },
-                                { label: 'Drafts',         value: stats.draft,     color: 'text-slate-500 dark:text-slate-400',     icon: '✏️' },
-                            ].map((s) => (
-                                <div key={s.label} className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 shadow-sm text-center">
-                                    <div className="text-2xl mb-1">{s.icon}</div>
-                                    <div className={`text-2xl font-extrabold ${s.color}`}>{s.value}</div>
-                                    <div className="text-xs text-slate-400 dark:text-slate-500 mt-0.5 font-medium">{s.label}</div>
-                                </div>
-                            ))}
-                        </div>
+                        {user?.role === 'TEAM_MEMBER' && (
+                            <div className="grid grid-cols-4 gap-3">
+                                {[
+                                    { label: 'Total Reports', value: stats.total,     color: 'text-indigo-600 dark:text-indigo-400',   icon: '📋' },
+                                    { label: 'Approved',       value: stats.approved,  color: 'text-emerald-600 dark:text-emerald-400', icon: '✅' },
+                                    { label: 'Submitted',      value: stats.submitted, color: 'text-violet-600 dark:text-violet-400',   icon: '📤' },
+                                    { label: 'Drafts',         value: stats.draft,     color: 'text-slate-500 dark:text-slate-400',     icon: '✏️' },
+                                ].map((s) => (
+                                    <div key={s.label} className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 shadow-sm text-center">
+                                        <div className="text-2xl mb-1">{s.icon}</div>
+                                        <div className={`text-2xl font-extrabold ${s.color}`}>{s.value}</div>
+                                        <div className="text-xs text-slate-400 dark:text-slate-500 mt-0.5 font-medium">{s.label}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
 
                         {/* ── Recent Reports ── */}
                         <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm overflow-hidden">
