@@ -25,10 +25,17 @@ export default function NewReportPage() {
 
     return (
         <ProtectedRoute allowedRoles={['TEAM_MEMBER']}>
-            <main className="max-w-3xl mx-auto p-8">
-                <h1 className="text-2xl font-semibold mb-6">New Weekly Report</h1>
-                <ReportForm initialData={emptyForm} onSave={handleSave} saveLabel="Save as Draft" />
-            </main>
+            <div className="min-h-screen">
+                {/* Page header */}
+                <div className="px-6 pt-8 pb-2">
+                    <h1 className="text-xl font-bold text-slate-800 dark:text-slate-100">New Weekly Report</h1>
+                    <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">Fill in your weekly activity and submit for review</p>
+                </div>
+
+                <main className="px-6 py-4">
+                    <ReportForm initialData={emptyForm} onSave={handleSave} saveLabel="Save as Draft" />
+                </main>
+            </div>
         </ProtectedRoute>
     );
 }
