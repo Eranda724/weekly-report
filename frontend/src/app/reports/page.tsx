@@ -58,6 +58,14 @@ export default function ReportHistoryPage() {
 
     const filtered = filterStatus ? reports.filter((r) => r.status === filterStatus) : reports;
 
+    const sorted = [...filtered].sort((a, b) => {
+        const weights: Record<string, number> = { DRAFT: 1, NEEDS_CORRECTION: 2, SUBMITTED: 3, APPROVED: 4 };
+        const wA = weights[a.status] || 99;
+        const wB = weights[b.status] || 99;
+        if (wA !== wB) return wA - wB;
+        return new Date(b.weekStartDate).getTime() - new Date(a.weekStartDate).getTime();
+    });
+
     const counts = {
         total:     reports.length,
         draft:     reports.filter((r) => r.status === 'DRAFT').length,
@@ -166,29 +174,35 @@ export default function ReportHistoryPage() {
                         </div>
                     )}
 
-                    {/* ── Report Cards ── */}
-                    {!loading && filtered.length > 0 && (
-                        <div className="flex flex-col gap-3">
-                            {filtered.map((report, i) => (
+                    {/* ── Report List ── */}
+                    {!loading && sorted.length > 0 && (
+                        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm overflow-hidden">
+                            <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                                <h2 className="font-semibold text-slate-700 dark:text-slate-200 text-sm">Your Reports</h2>
+                                <span className="text-xs text-slate-400 dark:text-slate-500">{sorted.length} result{sorted.length !== 1 ? 's' : ''}</span>
+                            </div>
+                            
+                            {sorted.map((report, i) => (
                                 <Link
                                     key={report.id}
-                                    href={`/reports/${report.id}`}
-                                    className="fade-up block no-underline bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-100 dark:hover:shadow-indigo-900/20 hover:border-indigo-300 dark:hover:border-indigo-700 transition-all duration-150"
-                                    style={{ animationDelay: `${i * 0.05}s` }}
+                                    href={['DRAFT', 'NEEDS_CORRECTION'].includes(report.status) ? `/reports/${report.id}/edit` : `/reports/${report.id}`}
+                                    className={`flex items-center justify-between px-6 py-4 transition-colors hover:bg-slate-50 dark:hover:bg-slate-700/40 no-underline
+                                        ${i !== 0 ? 'border-t border-slate-100 dark:border-slate-700/60' : ''}`}
                                 >
-                                    <div className="flex items-start justify-between gap-4">
-                                        {/* Left: date + meta */}
+                                    <div className="flex items-center gap-4 min-w-0">
+                                        <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 flex items-center justify-center shrink-0 shadow-sm">
+                                            <span className="text-xl">📅</span>
+                                        </div>
                                         <div className="min-w-0">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <span className="text-base">📅</span>
+                                            <div className="flex items-center gap-2 mb-1">
                                                 <span className="font-bold text-slate-800 dark:text-slate-100 text-[0.95rem]">
                                                     {weekRange(report.weekStartDate)}
                                                 </span>
                                             </div>
                                             <div className="flex items-center gap-2 flex-wrap">
                                                 {report.project?.name && (
-                                                    <span className="inline-flex items-center gap-1 bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-600 rounded-full px-2.5 py-0.5 text-xs font-medium">
-                                                        🏷 {report.project.name}
+                                                    <span className="inline-flex items-center gap-1 bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-600 rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
+                                                        {report.project.name}
                                                     </span>
                                                 )}
                                                 {report.currentVersion > 1 && (
@@ -196,21 +210,20 @@ export default function ReportHistoryPage() {
                                                         v{report.currentVersion}
                                                     </span>
                                                 )}
+                                                <span className="text-xs text-slate-400 dark:text-slate-500">
+                                                    • {report.submittedAt
+                                                        ? `Submitted ${new Date(report.submittedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`
+                                                        : `Created ${new Date(report.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`}
+                                                </span>
                                             </div>
-                                            <p className="text-xs text-slate-400 dark:text-slate-500 mt-2">
-                                                {report.submittedAt
-                                                    ? `Submitted ${new Date(report.submittedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`
-                                                    : `Created ${new Date(report.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`}
-                                            </p>
                                         </div>
+                                    </div>
 
-                                        {/* Right: status + action */}
-                                        <div className="flex flex-col items-end gap-3 shrink-0">
-                                            <StatusBadge status={report.status} />
-                                            <span className="text-xs font-semibold text-indigo-500 dark:text-indigo-400">
-                                                {['DRAFT', 'NEEDS_CORRECTION'].includes(report.status) ? 'Edit →' : 'View →'}
-                                            </span>
-                                        </div>
+                                    <div className="flex flex-col items-end gap-2 shrink-0">
+                                        <StatusBadge status={report.status} />
+                                        <span className={`text-xs font-semibold ${['DRAFT', 'NEEDS_CORRECTION'].includes(report.status) ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400 dark:text-slate-500'}`}>
+                                            {['DRAFT', 'NEEDS_CORRECTION'].includes(report.status) ? 'Edit Report →' : 'View Report →'}
+                                        </span>
                                     </div>
                                 </Link>
                             ))}

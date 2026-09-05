@@ -52,11 +52,11 @@ export default function HighlightsSection({ highlights, onChange }: Props) {
                     <p className="text-xs text-slate-400 dark:text-slate-500 italic">None added yet.</p>
                 )}
 
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-1.5">
                     {items.map((item, i) => (
                         <div
                             key={i}
-                            className="bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700 rounded-xl p-3"
+                            className="bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700 rounded-xl p-2.5"
                         >
                             <div className="flex items-start gap-2">
                                 {/* Star toggle */}
@@ -96,7 +96,7 @@ export default function HighlightsSection({ highlights, onChange }: Props) {
     }
 
     return (
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {renderList('BLOCKER',     blockers)}
             {renderList('ACHIEVEMENT', achievements)}
         </div>
