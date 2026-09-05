@@ -262,4 +262,5 @@ module.exports = {
     submitReport,
     reviewReport,
     listAllReports,
+    listMyReports,
 };

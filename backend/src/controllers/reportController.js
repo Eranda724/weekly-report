@@ -5,6 +5,7 @@ const {
     submitReport,
     reviewReport,
     listAllReports,
+    listMyReports,
 } = require('../services/reportService');
 
 async function create(req, res) {
