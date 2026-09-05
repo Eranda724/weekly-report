@@ -143,7 +143,7 @@ export type DashboardMetrics = {
     openBlockersCount: number;
   };
   trend: { weekStartDate: string; completedTasks: number }[];
-  statusByMember: { userId: string; name: string; status: string }[];
+  statusByMember: { userId: string; name: string; statuses: { week: string; status: string }[] }[];
   workloadByProject: { project: string; taskCount: number }[];
   timeByTaskType: { taskCategory: string; hours: number }[];
   activityFeed: { type: string; timestamp: string; text: string; reportId: string }[];

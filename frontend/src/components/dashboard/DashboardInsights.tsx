@@ -140,16 +140,7 @@ export default function DashboardInsights({ weekStartDate }: { weekStartDate?: s
         },
     ];
 
-    /* stacked bar data: one entry per member, bars for each status */
-    const memberNames = Array.from(new Set(statusByMember.map((r) => r.name)));
-    const stackedData = memberNames.map((name) => {
-        const row: Record<string, any> = { name };
-        Object.keys(STATUS_COLORS).forEach((s) => { row[s] = 0; });
-        statusByMember.filter((r) => r.name === name).forEach((r) => {
-            row[r.status] = (row[r.status] || 0) + 1;
-        });
-        return row;
-    });
+    /* Data already comes week-by-week from backend statusByMember */
 
     return (
         <div className="space-y-5">
@@ -206,37 +197,50 @@ export default function DashboardInsights({ weekStartDate }: { weekStartDate?: s
                             <h3 className="font-semibold text-slate-700 dark:text-slate-200 text-sm mb-4">
                                 Report Submission Status by Team Member
                             </h3>
-                            {stackedData.length === 0 ? (
+                            {statusByMember.length === 0 ? (
                                 <p className="text-xs text-slate-400 dark:text-slate-500 italic">No data.</p>
                             ) : (
-                                <>
-                                    <ResponsiveContainer width="100%" height={220}>
-                                        <BarChart data={stackedData} layout="vertical" barSize={10} margin={{ left: -10, right: 8, top: 0, bottom: 0 }}>
-                                            <XAxis type="number" hide />
-                                            <YAxis
-                                                type="category"
-                                                dataKey="name"
-                                                width={90}
-                                                tick={{ fontSize: 11, fill: '#94a3b8' }}
-                                                tickFormatter={(v: string) => v.split(' ')[0]}
-                                                axisLine={{ stroke: '#475569' }}
-                                                tickLine={false}
-                                            />
-                                            <Tooltip
-                                                contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #e2e8f0' }}
-                                            />
-                                            {Object.entries(STATUS_COLORS).map(([status, color]) => (
-                                                <Bar key={status} dataKey={status} stackId="a" fill={color} />
+                                <div className="flex-1 overflow-auto mt-2">
+                                    <table className="w-full text-left border-collapse">
+                                        <thead>
+                                            <tr>
+                                                <th className="pb-3 text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider w-1/4">Member</th>
+                                                {statusByMember[0]?.statuses.map((s, i, arr) => (
+                                                    <th key={s.week} className="pb-3 text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider text-center">
+                                                        {i === arr.length - 1 ? 'This Week' : `Week ${i + 1}`}
+                                                    </th>
+                                                ))}
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-slate-100 dark:divide-slate-700/50">
+                                            {statusByMember.map((m) => (
+                                                <tr key={m.userId}>
+                                                    <td className="py-3 text-xs font-semibold text-slate-700 dark:text-slate-200 whitespace-nowrap">
+                                                        {m.name.split(' ')[0]}
+                                                    </td>
+                                                    {m.statuses.map((s) => {
+                                                        const color = STATUS_COLORS[s.status] || STATUS_COLORS.NOT_STARTED;
+                                                        return (
+                                                            <td key={s.week} className="py-3 px-1.5 align-middle">
+                                                                <div 
+                                                                    className="w-full h-1.5 rounded-full" 
+                                                                    style={{ backgroundColor: color }} 
+                                                                    title={`${s.status.replace('_', ' ')} (Week of ${new Date(s.week).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})`}
+                                                                />
+                                                            </td>
+                                                        );
+                                                    })}
+                                                </tr>
                                             ))}
-                                        </BarChart>
-                                    </ResponsiveContainer>
-                                    <div className="flex flex-wrap gap-x-4 gap-y-2 mt-2 text-[11px] font-medium tracking-wide">
-                                        {Object.entries(STATUS_COLORS).map(([s, c]) => (
-                                            <LegendDot key={s} color={c} label={s.replace('_', ' ')} />
-                                        ))}
-                                    </div>
-                                </>
+                                        </tbody>
+                                    </table>
+                                </div>
                             )}
+                            <div className="flex flex-wrap gap-x-4 gap-y-2 mt-4 text-[11px] font-medium tracking-wide border-t border-slate-100 dark:border-slate-700/50 pt-4">
+                                {Object.entries(STATUS_COLORS).map(([s, c]) => (
+                                    <LegendDot key={s} color={c} label={s.replace('_', ' ')} />
+                                ))}
+                            </div>
                         </div>
 
                         {/* Col 2: Time Spent by Task Type (donut) */}

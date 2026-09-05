@@ -5,7 +5,7 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import Sidebar from '@/components/Sidebar';
 import ManagerSidebar from '@/components/ManagerSidebar';
 import { useAuth } from '@/context/AuthContext';
-import { reportsApi } from '@/lib/api';
+import { reportsApi, managerReportsApi } from '@/lib/api';
 import { Report, ReportStatus } from '@/types/report';
 
 const STATUS_CONFIG: Record<ReportStatus, { label: string; cls: string }> = {
@@ -21,12 +21,24 @@ export default function ProfilePage() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        reportsApi
-            .listMine({ pageSize: 100 })
-            .then((res) => setReports(res.reports))
-            .catch(() => {})
-            .finally(() => setLoading(false));
-    }, []);
+        if (!user) return;
+        
+        if (user.role === 'MANAGER' || user.role === 'ADMIN') {
+            managerReportsApi.listAll({ pageSize: 100 })
+                .then((res) => {
+                    const sorted = res.reports.sort((a, b) => new Date((b as any).updatedAt || (b as any).createdAt).getTime() - new Date((a as any).updatedAt || (a as any).createdAt).getTime());
+                    setReports(sorted);
+                })
+                .catch(() => {})
+                .finally(() => setLoading(false));
+        } else {
+            reportsApi
+                .listMine({ pageSize: 100 })
+                .then((res) => setReports(res.reports))
+                .catch(() => {})
+                .finally(() => setLoading(false));
+        }
+    }, [user]);
 
     const stats = {
         total:     reports.length,
@@ -117,7 +129,7 @@ export default function ProfilePage() {
                             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-700">
                                 <h3 className="font-semibold text-slate-700 dark:text-slate-200 text-sm">Recent Reports</h3>
                                 <Link
-                                    href="/reports"
+                                    href={user?.role === 'MANAGER' || user?.role === 'ADMIN' ? "/dashboard/reports" : "/reports"}
                                     className="text-xs text-indigo-500 dark:text-indigo-400 font-semibold no-underline hover:underline"
                                 >
                                     View all →
@@ -135,10 +147,12 @@ export default function ProfilePage() {
                             {!loading && reports.length === 0 && (
                                 <div className="px-6 py-10 text-center">
                                     <p className="text-slate-400 dark:text-slate-500 text-sm">No reports yet.</p>
-                                    <Link href="/reports/new"
-                                        className="mt-3 inline-block text-xs text-indigo-500 dark:text-indigo-400 font-semibold no-underline hover:underline">
-                                        Submit your first report →
-                                    </Link>
+                                    {user?.role === 'TEAM_MEMBER' && (
+                                        <Link href="/reports/new"
+                                            className="mt-3 inline-block text-xs text-indigo-500 dark:text-indigo-400 font-semibold no-underline hover:underline">
+                                            Submit your first report →
+                                        </Link>
+                                    )}
                                 </div>
                             )}
 
@@ -160,11 +174,15 @@ export default function ProfilePage() {
                                                 <p className="text-sm font-semibold text-slate-700 dark:text-slate-200 truncate">
                                                     Week of {weekOf}
                                                 </p>
-                                                {report.project?.name && (
+                                                {user?.role === 'MANAGER' || user?.role === 'ADMIN' ? (
+                                                    <p className="text-xs text-slate-400 dark:text-slate-500 truncate">
+                                                        Actioned: {new Date((report as any).updatedAt || report.createdAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
+                                                    </p>
+                                                ) : report.project?.name ? (
                                                     <p className="text-xs text-slate-400 dark:text-slate-500 truncate">
                                                         {report.project.name}
                                                     </p>
-                                                )}
+                                                ) : null}
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-3 shrink-0">

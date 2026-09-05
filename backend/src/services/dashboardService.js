@@ -33,10 +33,12 @@ async function getSummaryMetrics(weekStartDate) {
     });
 
     const submittedCount = weekReports.filter((r) => r.status !== 'DRAFT').length;
-    const newReportsCount = weekReports.filter((r) => r.status === 'SUBMITTED').length;
-    const needsCorrectionCount = weekReports.filter((r) => r.status === 'NEEDS_CORRECTION').length;
-    const acceptedReportsCount = weekReports.filter((r) => r.status === 'APPROVED').length;
-    const draftReportsCount = weekReports.filter((r) => r.status === 'DRAFT').length;
+
+    // Global counts (all time) for manager action items
+    const newReportsCount = await prisma.report.count({ where: { status: 'SUBMITTED' } });
+    const needsCorrectionCount = await prisma.report.count({ where: { status: 'NEEDS_CORRECTION' } });
+    const acceptedReportsCount = await prisma.report.count({ where: { status: 'APPROVED' } });
+    const draftReportsCount = await prisma.report.count({ where: { status: 'DRAFT' } });
 
     const reportedUserIds = new Set(weekReports.map((r) => r.userId));
     const missingCount = Math.max(activeMembers - reportedUserIds.size, 0);
@@ -45,7 +47,7 @@ async function getSummaryMetrics(weekStartDate) {
 
     const openBlockersCount = await prisma.report.count({
         where: {
-            status: { not: 'APPROVED' },
+            status: 'SUBMITTED', // focus on submitted reports who have blockers
             highlights: {
                 some: { itemType: 'BLOCKER' }
             }
@@ -96,26 +98,42 @@ async function getTasksCompletedTrend(weeksBack = 8) {
 }
 
 // --- Submission/approval status by team member, for a given week ---
-async function getStatusByMember(weekStartDate) {
+async function getStatusByMember(weekStartDate, weeksBack = 4) {
     const weekStart = startOfWeek(weekStartDate);
+    const earliest = addDays(weekStart, -7 * (weeksBack - 1));
 
     const members = await prisma.user.findMany({
         where: { role: 'TEAM_MEMBER', isActive: true },
         select: { id: true, name: true },
     });
 
-    const weekEnd = addDays(weekStart, 7);
     const reports = await prisma.report.findMany({
-        where: { weekStartDate: { gte: weekStart, lt: weekEnd } },
-        select: { userId: true, status: true },
+        where: { weekStartDate: { gte: earliest, lt: addDays(weekStart, 7) } },
+        select: { userId: true, status: true, weekStartDate: true },
     });
-    const byUser = new Map(reports.map((r) => [r.userId, r.status]));
 
-    return members.map((m) => ({
-        userId: m.id,
-        name: m.name,
-        status: byUser.get(m.id) || 'NOT_STARTED',
-    }));
+    const weeks = [];
+    for (let i = weeksBack - 1; i >= 0; i--) {
+        weeks.push(addDays(weekStart, -7 * i).toISOString().slice(0, 10));
+    }
+
+    const reportMap = new Map();
+    for (const r of reports) {
+        const w = startOfWeek(r.weekStartDate).toISOString().slice(0, 10);
+        reportMap.set(`${r.userId}_${w}`, r.status);
+    }
+
+    return members.map((m) => {
+        const statuses = weeks.map((w) => ({
+            week: w,
+            status: reportMap.get(`${m.id}_${w}`) || 'NOT_STARTED'
+        }));
+        return {
+            userId: m.id,
+            name: m.name,
+            statuses,
+        };
+    });
 }
 
 // --- Workload / task distribution by project (all-time or filtered week) ---
