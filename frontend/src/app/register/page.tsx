@@ -23,39 +23,71 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gray-50">
-      <form onSubmit={handleSubmit} className="w-full max-w-sm bg-white p-8 rounded-lg shadow space-y-4">
-        <h1 className="text-2xl font-semibold text-center">Register</h1>
-        {error && <p className="text-red-600 text-sm">{error}</p>}
-        <input
-          type="text"
-          placeholder="Full Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-          className="w-full border rounded px-3 py-2 text-black"
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          className="w-full border rounded px-3 py-2 text-black"
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          className="w-full border rounded px-3 py-2 text-black"
-        />
-        <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
-          Register
+    <main className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-900 p-4 transition-colors duration-200 relative overflow-hidden">
+      {/* Background decorations */}
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-500/20 dark:bg-indigo-500/10 blur-[120px]" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-violet-500/20 dark:bg-violet-500/10 blur-[120px]" />
+
+      <form onSubmit={handleSubmit} className="relative w-full max-w-md bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/60 p-8 sm:p-10 rounded-[2rem] shadow-2xl space-y-6">
+        <div className="text-center space-y-2 mb-8">
+          <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-500/30">
+            <span className="text-white text-xl">🚀</span>
+          </div>
+          <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">Create Account</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400">Join your team and track your progress</p>
+        </div>
+        
+        {error && (
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 rounded-xl p-3 text-center">
+            <p className="text-red-600 dark:text-red-400 text-sm font-medium">{error}</p>
+          </div>
+        )}
+        
+        <div className="space-y-4">
+          <div className="space-y-1.5">
+            <label className="text-sm font-semibold text-slate-700 dark:text-slate-200 ml-1">Full Name</label>
+            <input
+              type="text"
+              placeholder="Jane Doe"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              className="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-sm font-semibold text-slate-700 dark:text-slate-200 ml-1">Email</label>
+            <input
+              type="email"
+              placeholder="name@company.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-sm font-semibold text-slate-700 dark:text-slate-200 ml-1">Password</label>
+            <input
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
+            />
+          </div>
+        </div>
+
+        <button 
+          type="submit" 
+          className="w-full bg-gradient-to-r from-indigo-500 to-violet-600 text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/40 hover:opacity-90 transition-all active:scale-[0.98]"
+        >
+          Sign Up
         </button>
-        <p className="text-sm text-center">
-          Already have an account? <a href="/login" className="text-blue-600">Log In</a>
+
+        <p className="text-sm text-center text-slate-500 dark:text-slate-400 pt-2">
+          Already have an account? <a href="/login" className="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline transition-all">Sign in</a>
         </p>
       </form>
     </main>
