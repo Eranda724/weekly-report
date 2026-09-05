@@ -150,3 +150,10 @@ export const dashboardApi = {
   getMetrics: (weekStartDate?: string): Promise<DashboardMetrics> =>
     apiFetch(`/dashboard/metrics${weekStartDate ? `?weekStartDate=${weekStartDate}` : ''}`),
 };
+
+export const aiApi = {
+  chat: (question: string): Promise<{ answer: string }> =>
+    apiFetch('/ai/chat', { method: 'POST', body: JSON.stringify({ question }) }),
+  getSummary: (weekStartDate?: string): Promise<{ summary: string }> =>
+    apiFetch(`/ai/summary${weekStartDate ? `?weekStartDate=${weekStartDate}` : ''}`),
+};

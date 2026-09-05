@@ -15,5 +15,6 @@ app.use('/api/projects', require('./routes/projectRoutes'));
 app.use('/api/reports', require('./routes/reportRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/dashboard', require('./routes/dashboardRoutes'));
+app.use('/api/ai', require('./routes/aiRoutes'));
 
 module.exports = app;

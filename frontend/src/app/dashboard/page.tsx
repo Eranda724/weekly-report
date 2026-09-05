@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { managerReportsApi, projectsApi, usersApi, Project, BasicUser } from '@/lib/api';
 import { Report } from '@/types/report';
 import DashboardInsights from '@/components/dashboard/DashboardInsights';
+import AIChatWidget from '@/components/AIChatWidget';
 
 const statusColors: Record<string, string> = {
     DRAFT: 'bg-gray-200 text-gray-800',
@@ -201,8 +202,8 @@ export default function DashboardPage() {
                         ))}
                     </div>
                 )}
-                
                 <DashboardInsights weekStartDate={filters.weekStartDate || undefined} />
+                <AIChatWidget weekStartDate={filters.weekStartDate || undefined} />
             </main>
         </ProtectedRoute>
     );
