@@ -1,4 +1,5 @@
 'use client';
+import { Suspense } from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
@@ -10,7 +11,7 @@ const NAV_ITEMS = [
     { label: 'Profile', href: '/profile', icon: '/assets/user.png' },
 ];
 
-export default function ManagerSidebar() {
+function ManagerSidebarContent() {
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const { user, logout } = useAuth();
@@ -131,5 +132,16 @@ export default function ManagerSidebar() {
                 </div>
             </div>
         </aside>
+    );
+}
+export default function ManagerSidebar() {
+    return (
+        <Suspense
+            fallback={
+                <aside className="fixed top-0 left-0 h-screen w-60 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700 z-20" />
+            }
+        >
+            <ManagerSidebarContent />
+        </Suspense>
     );
 }
