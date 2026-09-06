@@ -55,7 +55,7 @@ beforeAll(async () => {
     // Create a project as manager, and a report as the team member, to test ownership on
     const projectRes = await request(app)
         .post('/api/projects')
-        .set('Authorization', `Bearer ${managerToken}`)
+        .set('Authorization', `Bearer ${adminToken}`)
         .send({ name: 'RBAC Test Project' });
     testProjectId = projectRes.body.id;
 
@@ -114,6 +114,16 @@ describe('Role-based access — manager/admin-only routes', () => {
         const res = await request(app)
             .post('/api/projects')
             .set('Authorization', `Bearer ${managerToken}`)
+            .send({ name: 'Should Be Created By Manager' });
+        expect(res.status).toBe(201);
+        // clean up immediately
+        await prisma.project.delete({ where: { id: res.body.id } });
+    });
+
+    it('allows an ADMIN to create a project', async () => {
+        const res = await request(app)
+            .post('/api/projects')
+            .set('Authorization', `Bearer ${adminToken}`)
             .send({ name: 'RBAC Temp Project' });
         expect(res.status).toBe(201);
         // clean up immediately

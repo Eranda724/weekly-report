@@ -33,7 +33,7 @@ export default function UserManagementContent() {
     // UI States
     const searchParams = useSearchParams();
     const router = useRouter();
-    const activeTab = searchParams.get('tab') === 'teams' ? 'teams' : 'users';
+    const activeTab = searchParams.get('tab') === 'teams' ? 'teams' : (user?.role === 'MANAGER' ? 'teams' : 'users');
 
     const setActiveTab = (tab: 'users' | 'teams') => {
         router.push(`/admin/users${tab === 'teams' ? '?tab=teams' : ''}`);
@@ -56,7 +56,7 @@ export default function UserManagementContent() {
         setLoading(true);
         try {
             const [usersData, projectsData] = await Promise.all([
-                usersAdminApi.listAll(),
+                user?.role === 'ADMIN' ? usersAdminApi.listAll() : Promise.resolve([]),
                 projectsApi.list()
             ]);
             setUsers(usersData);
@@ -255,7 +255,7 @@ export default function UserManagementContent() {
     );
 
     return (
-        <ProtectedRoute allowedRoles={['ADMIN']}>
+        <ProtectedRoute allowedRoles={['ADMIN', 'MANAGER']}>
             <div className="flex h-screen bg-slate-50 dark:bg-slate-950 overflow-hidden">
                 {/* Side Panel */}
                 <ManagerSidebar />

@@ -74,9 +74,9 @@ async function getReportById(reportId, requestingUser) {
     // Role-aware access check, right here in the service layer
     const isOwner = report.userId === requestingUser.id;
     const isAdmin = requestingUser.role === 'ADMIN';
-    const isManagerOfProject = requestingUser.role === 'MANAGER' && report.project.projectMembers.some(m => m.userId === requestingUser.id);
+    const isManager = requestingUser.role === 'MANAGER';
 
-    if (!isOwner && !isAdmin && !isManagerOfProject) {
+    if (!isOwner && !isAdmin && !isManager) {
         throw new Error('Forbidden');
     }
     
@@ -245,13 +245,8 @@ async function listAllReports(requestingUser, filters = {}) {
         ...(weekStartDate ? { weekStartDate: new Date(weekStartDate) } : {}),
     };
 
-    if (requestingUser.role === 'MANAGER') {
-        where.project = {
-            projectMembers: {
-                some: { userId: requestingUser.id }
-            }
-        };
-    }
+    // Managers and Admins can see all reports matching the basic filters.
+    // ProjectMembership gating has been disabled.
 
     const [reports, total] = await Promise.all([
         prisma.report.findMany({

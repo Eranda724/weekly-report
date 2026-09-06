@@ -7,13 +7,13 @@ const { list, create, update, remove, addMember, removeMember } = require('../co
 // Any logged-in user can view projects (needed for the report form dropdown)
 router.get('/', requireAuth, list);
 
-// Only admins can modify projects
-router.post('/', requireAuth, requireRole('ADMIN'), create);
-router.put('/:id', requireAuth, requireRole('ADMIN'), update);
-router.delete('/:id', requireAuth, requireRole('ADMIN'), remove);
+// Managers and Admins can modify projects
+router.post('/', requireAuth, requireRole('MANAGER', 'ADMIN'), create);
+router.put('/:id', requireAuth, requireRole('MANAGER', 'ADMIN'), update);
+router.delete('/:id', requireAuth, requireRole('MANAGER', 'ADMIN'), remove);
 
-// Team members endpoints (Admin only manages members)
-router.post('/:id/members', requireAuth, requireRole('ADMIN'), addMember);
-router.delete('/:id/members/:userId', requireAuth, requireRole('ADMIN'), removeMember);
+// Team members endpoints
+router.post('/:id/members', requireAuth, requireRole('MANAGER', 'ADMIN'), addMember);
+router.delete('/:id/members/:userId', requireAuth, requireRole('MANAGER', 'ADMIN'), removeMember);
 
 module.exports = router;
