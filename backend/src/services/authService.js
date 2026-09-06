@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 const prisma = require('../config/prisma');
 const { generateToken } = require('../config/jwt');
 
-async function registerUser({ name, email, password, role }) {
+async function registerUser({ name, email, password }) {
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
         throw new Error('Email already registered');
@@ -15,7 +15,7 @@ async function registerUser({ name, email, password, role }) {
             name,
             email,
             passwordHash,
-            role: role || 'TEAM_MEMBER',
+            role: 'TEAM_MEMBER',
         },
     });
 
