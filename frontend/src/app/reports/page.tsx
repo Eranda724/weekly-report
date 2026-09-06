@@ -192,8 +192,8 @@ export default function ReportHistoryPage() {
                                         ${i !== 0 ? 'border-t border-slate-100 dark:border-slate-700/60' : ''}`}
                                 >
                                     <div className="flex items-center gap-4 min-w-0">
-                                        <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 flex items-center justify-center shrink-0 shadow-sm">
-                                            <span className="text-xl">📅</span>
+                                        <div className="w-10 h-10 flex items-center justify-center shrink-0 shadow-sm">
+                                            <img src="/assets/paper.png" alt="Report" className="w-8 h-8" />
                                         </div>
                                         <div className="min-w-0">
                                             <div className="flex items-center gap-2 mb-1">
