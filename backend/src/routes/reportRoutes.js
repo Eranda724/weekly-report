@@ -9,12 +9,14 @@ router.post('/', requireAuth, requireRole('TEAM_MEMBER'), create);
 router.put('/:id', requireAuth, requireRole('TEAM_MEMBER'), update);
 router.post('/:id/submit', requireAuth, requireRole('TEAM_MEMBER'), submit);
 
-// Viewing stays open to any authenticated user — role-aware filtering happens inside the service
-router.get('/:id', requireAuth, getOne);
+// Static routes 
+router.get('/team/all', requireAuth, requireRole('MANAGER', 'ADMIN'), listAll);
 router.get('/', requireAuth, listMine);
+
+// Dynamic param routes below all static paths
+router.get('/:id', requireAuth, getOne);
 
 // review and correction workflow
 router.post('/:id/review', requireAuth, requireRole('MANAGER', 'ADMIN'), review);
-router.get('/team/all', requireAuth, requireRole('MANAGER', 'ADMIN'), listAll);
 
 module.exports = router;
