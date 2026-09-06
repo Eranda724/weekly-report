@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import {
     LineChart, Line, BarChart, Bar,
     PieChart, Pie, Cell,
@@ -215,8 +216,10 @@ export default function DashboardInsights({ weekStartDate }: { weekStartDate?: s
                                         <tbody className="divide-y divide-slate-100 dark:divide-slate-700/50">
                                             {statusByMember.map((m) => (
                                                 <tr key={m.userId}>
-                                                    <td className="py-3 text-xs font-semibold text-slate-700 dark:text-slate-200 whitespace-nowrap">
-                                                        {m.name.split(' ')[0]}
+                                                    <td className="py-3 text-xs font-semibold whitespace-nowrap">
+                                                        <Link href={`/profile/${m.userId}`} className="text-indigo-600 dark:text-indigo-400 hover:underline hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors">
+                                                            {m.name.split(' ')[0]}
+                                                        </Link>
                                                     </td>
                                                     {m.statuses.map((s) => {
                                                         const color = STATUS_COLORS[s.status] || STATUS_COLORS.NOT_STARTED;
