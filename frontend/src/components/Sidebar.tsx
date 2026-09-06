@@ -31,12 +31,11 @@ export default function Sidebar() {
 
             {/* ── Brand ── */}
             <div className="flex items-center gap-2.5 px-5 h-16 border-b border-slate-100 dark:border-slate-800 shrink-0">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-sm shrink-0">
-                    <span className="text-white text-sm font-bold">W</span>
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center shadow-sm shrink-0 overflow-hidden bg-white dark:bg-slate-800">
+                    <img src="/assets/logo.jpg" alt="Reeweek Logo" className="w-full h-full object-cover" />
                 </div>
-                <span className="font-bold text-slate-800 dark:text-slate-100 text-sm leading-tight">
-                    Weekly Report<br />
-                    <span className="text-xs font-normal text-slate-400 dark:text-slate-500">Generator</span>
+                <span className="font-bold text-slate-800 dark:text-slate-100 text-base leading-tight">
+                    Reeweek
                 </span>
             </div>
 
