@@ -59,6 +59,12 @@ export default function ManagerReviewPage() {
         return null;
     }, [selectedVersionId, report]);
 
+    const activeVersionComment = useMemo(() => {
+        if (!report) return null;
+        if (isLatest) return report.reviewComments?.[0];
+        return report.reviewComments?.find((c: any) => c.versionId === selectedVersionId);
+    }, [isLatest, report, selectedVersionId]);
+
     // Derive display data based on version selected
     const displayTasks = isLatest ? report?.tasks || [] : activeSnapshot?.tasks || [];
     const displayBlockers = isLatest
@@ -207,6 +213,34 @@ export default function ManagerReviewPage() {
                         {error && (
                             <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl px-4 py-3 text-red-700 dark:text-red-400 text-sm">
                                 {error}
+                            </div>
+                        )}
+
+                        {/* Manager Feedback Alert */}
+                        {activeVersionComment && activeVersionComment.decision === 'NEEDS_CORRECTION' && (
+                            <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-300 dark:border-amber-700/50 rounded-3xl p-6 shadow-sm">
+                                <div className="flex items-start gap-3">
+                                    <div className="text-xl">⚠️</div>
+                                    <div>
+                                        <h3 className="font-bold text-amber-800 dark:text-amber-400 mb-1">Manager requested changes</h3>
+                                        <p className="text-sm text-amber-900 dark:text-amber-200/90 whitespace-pre-wrap">{activeVersionComment.commentText}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Approved Alert */}
+                        {!isLatest && activeVersionComment?.decision === 'APPROVED' && (
+                            <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-300 dark:border-emerald-700/50 rounded-3xl p-6 shadow-sm flex flex-col gap-1">
+                                <div className="flex items-center gap-3">
+                                    <div className="text-xl">✅</div>
+                                    <h3 className="font-bold text-emerald-800 dark:text-emerald-400">
+                                        Approved{activeVersionComment?.createdAt ? ` on ${new Date(activeVersionComment.createdAt).toLocaleDateString()}` : ''}
+                                    </h3>
+                                </div>
+                                {activeVersionComment?.commentText && (
+                                     <p className="text-sm text-emerald-900 dark:text-emerald-200/90 whitespace-pre-wrap ml-9">{activeVersionComment.commentText}</p>
+                                )}
                             </div>
                         )}
 
