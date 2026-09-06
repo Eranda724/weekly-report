@@ -102,7 +102,7 @@ export default function DashboardInsights({ weekStartDate }: { weekStartDate?: s
     );
     if (!data) return null;
 
-    const { summary, trend, statusByMember, timeByTaskType, activityFeed } = data;
+    const { summary, trend, statusByMember, workloadByProject, timeByTaskType, activityFeed } = data;
 
     /* Derived totals for submitted this week card */
     const totalMembers = summary.complianceRate.submitted + summary.complianceRate.pending + summary.complianceRate.late;
@@ -141,11 +141,8 @@ export default function DashboardInsights({ weekStartDate }: { weekStartDate?: s
         },
     ];
 
-    /* Data already comes week-by-week from backend statusByMember */
-
     return (
         <div className="space-y-5">
-
             {/* ── API stat cards ── */}
             <div className="grid grid-cols-6 gap-3">
                 {apiCards.map((card) => (
@@ -158,6 +155,7 @@ export default function DashboardInsights({ weekStartDate }: { weekStartDate?: s
                 ))}
             </div>
 
+            {/* ── Top row: Trend & Activity Feed ── */}
             <div className="grid grid-cols-3 gap-5">
                 <div className="col-span-2 space-y-5">
                     {/* ── Task Completion Trend (full width line chart) ── */}
@@ -190,103 +188,6 @@ export default function DashboardInsights({ weekStartDate }: { weekStartDate?: s
                             </LineChart>
                         </ResponsiveContainer>
                     </ChartCard>
-
-                    {/* ── Status and Time (2-col row inside the left area) ── */}
-                    <div className="grid grid-cols-2 gap-5">
-                        {/* Col 1: Status by Team Member (stacked horizontal bar) */}
-                        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-5 shadow-sm flex flex-col justify-between">
-                            <h3 className="font-semibold text-slate-700 dark:text-slate-200 text-sm mb-4">
-                                Report Submission Status by Team Member
-                            </h3>
-                            {statusByMember.length === 0 ? (
-                                <p className="text-xs text-slate-400 dark:text-slate-500 italic">No data.</p>
-                            ) : (
-                                <div className="flex-1 overflow-auto mt-2">
-                                    <table className="w-full text-left border-collapse">
-                                        <thead>
-                                            <tr>
-                                                <th className="pb-3 text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider w-1/4">Member</th>
-                                                {statusByMember[0]?.statuses.map((s, i, arr) => (
-                                                    <th key={s.week} className="pb-3 text-[11px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider text-center">
-                                                        {i === arr.length - 1 ? 'This Week' : `Week ${i + 1}`}
-                                                    </th>
-                                                ))}
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-slate-100 dark:divide-slate-700/50">
-                                            {statusByMember.map((m) => (
-                                                <tr key={m.userId}>
-                                                    <td className="py-3 text-xs font-semibold whitespace-nowrap">
-                                                        <Link href={`/profile/${m.userId}`} className="text-indigo-600 dark:text-indigo-400 hover:underline hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors">
-                                                            {m.name.split(' ')[0]}
-                                                        </Link>
-                                                    </td>
-                                                    {m.statuses.map((s) => {
-                                                        const color = STATUS_COLORS[s.status] || STATUS_COLORS.NOT_STARTED;
-                                                        return (
-                                                            <td key={s.week} className="py-3 px-1.5 align-middle">
-                                                                <div 
-                                                                    className="w-full h-1.5 rounded-full" 
-                                                                    style={{ backgroundColor: color }} 
-                                                                    title={`${s.status.replace('_', ' ')} (Week of ${new Date(s.week).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})`}
-                                                                />
-                                                            </td>
-                                                        );
-                                                    })}
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            )}
-                            <div className="flex flex-wrap gap-x-4 gap-y-2 mt-4 text-[11px] font-medium tracking-wide border-t border-slate-100 dark:border-slate-700/50 pt-4">
-                                {Object.entries(STATUS_COLORS).map(([s, c]) => (
-                                    <LegendDot key={s} color={c} label={s.replace('_', ' ')} />
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Col 2: Time Spent by Task Type (donut) */}
-                        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-5 shadow-sm flex flex-col justify-between">
-                            <h3 className="font-semibold text-slate-700 dark:text-slate-200 text-sm mb-4">
-                                Time Spent by Task Type (Team Wide)
-                            </h3>
-                            {timeByTaskType.length === 0 ? (
-                                <p className="text-xs text-slate-400 dark:text-slate-500 italic">No data.</p>
-                            ) : (
-                                <>
-                                    <ResponsiveContainer width="100%" height={220}>
-                                        <PieChart margin={{ top: 15, right: 15, bottom: 15, left: 15 }}>
-                                            <Pie
-                                                data={timeByTaskType}
-                                                dataKey="hours"
-                                                nameKey="taskCategory"
-                                                cx="50%" cy="50%"
-                                                innerRadius={45}
-                                                outerRadius={70}
-                                                paddingAngle={2}
-                                                label={renderCustomizedLabel}
-                                                labelLine={false}
-                                            >
-                                                {timeByTaskType.map((_, i) => (
-                                                    <Cell key={i} fill={DONUT_COLORS[i % DONUT_COLORS.length]} />
-                                                ))}
-                                            </Pie>
-                                            <Tooltip
-                                                formatter={(val: any) => [`${val}h`, '']}
-                                                contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #e2e8f0' }}
-                                            />
-                                        </PieChart>
-                                    </ResponsiveContainer>
-                                    <div className="flex flex-col gap-1.5 mt-2 ml-2 text-[11px]">
-                                        {timeByTaskType.map((entry, i) => (
-                                            <LegendDot key={i} color={DONUT_COLORS[i % DONUT_COLORS.length]} label={entry.taskCategory} />
-                                        ))}
-                                    </div>
-                                </>
-                            )}
-                        </div>
-                    </div>
                 </div>
 
                 {/* ── Right side (Recent Activity Feed) ── */}
@@ -297,7 +198,7 @@ export default function DashboardInsights({ weekStartDate }: { weekStartDate?: s
                     {activityFeed.length === 0 ? (
                         <p className="text-xs text-slate-400 dark:text-slate-500 italic">No recent activity.</p>
                     ) : (
-                        <ul className="flex flex-col gap-3 flex-1 overflow-y-auto">
+                        <ul className="flex flex-col gap-3 flex-1 overflow-y-auto max-h-[260px] pr-2">
                             {activityFeed.slice(0, 10).map((item, i) => (
                                 <li key={i} className="flex flex-col gap-0.5">
                                     <p className="text-sm text-slate-700 dark:text-slate-200 leading-snug">{item.text}</p>
@@ -313,6 +214,117 @@ export default function DashboardInsights({ weekStartDate }: { weekStartDate?: s
                                 </li>
                             ))}
                         </ul>
+                    )}
+                </div>
+            </div>
+
+            {/* ── Bottom row: 3 distinct charts ── */}
+            <div className="grid grid-cols-3 gap-5">
+                {/* 1: Status by Member (Horizontal Bar Chart) */}
+                <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-5 shadow-sm flex flex-col justify-between">
+                    <h3 className="font-semibold text-slate-700 dark:text-slate-200 text-sm mb-4">
+                        Report Submission Status
+                    </h3>
+                    {statusByMember.length === 0 ? (
+                        <p className="text-xs text-slate-400 dark:text-slate-500 italic">No data.</p>
+                    ) : (
+                        <ResponsiveContainer width="100%" height={220}>
+                            <BarChart data={statusByMember} layout="vertical" margin={{ top: 0, right: 10, left: 10, bottom: 0 }}>
+                                <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#e2e8f0" />
+                                <XAxis type="number" hide />
+                                <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: '#94a3b8' }} width={80} tickFormatter={(val) => val.split(' ')[0]} />
+                                <Tooltip 
+                                    contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #e2e8f0' }} 
+                                    cursor={{fill: 'rgba(99, 102, 241, 0.05)'}}
+                                    formatter={(value: any, name: any, props: any) => {
+                                        const statuses = props.payload.statuses;
+                                        const latestStatus = statuses[statuses.length - 1]?.status || 'NOT_STARTED';
+                                        return [latestStatus.replace('_', ' '), 'Status'];
+                                    }}
+                                />
+                                <Bar dataKey={() => 1} fill="#e2e8f0" radius={[0, 4, 4, 0]} barSize={20}>
+                                    {statusByMember.map((entry, i) => {
+                                        const statuses = entry.statuses || [];
+                                        const lastStatus = statuses[statuses.length - 1]?.status || 'NOT_STARTED';
+                                        return <Cell key={i} fill={STATUS_COLORS[lastStatus] || STATUS_COLORS.NOT_STARTED} />;
+                                    })}
+                                </Bar>
+                            </BarChart>
+                        </ResponsiveContainer>
+                    )}
+                    <div className="flex flex-wrap gap-x-3 gap-y-1 mt-4 text-[10px] font-medium tracking-wide border-t border-slate-100 dark:border-slate-700/50 pt-3">
+                        {Object.entries(STATUS_COLORS).map(([s, c]) => (
+                            <LegendDot key={s} color={c} label={s.replace('_', ' ')} />
+                        ))}
+                    </div>
+                </div>
+
+                {/* 2: Workload by Project (Donut Chart) */}
+                <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-5 shadow-sm flex flex-col justify-between">
+                    <h3 className="font-semibold text-slate-700 dark:text-slate-200 text-sm mb-4">
+                        Workload by Project
+                    </h3>
+                    {!workloadByProject || workloadByProject.length === 0 ? (
+                        <p className="text-xs text-slate-400 dark:text-slate-500 italic">No data.</p>
+                    ) : (
+                        <>
+                            <ResponsiveContainer width="100%" height={220}>
+                                <PieChart margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
+                                    <Pie
+                                        data={workloadByProject}
+                                        dataKey="taskCount"
+                                        nameKey="project"
+                                        cx="50%" cy="50%"
+                                        innerRadius={40}
+                                        outerRadius={70}
+                                        paddingAngle={2}
+                                        label={renderCustomizedLabel}
+                                        labelLine={false}
+                                    >
+                                        {workloadByProject.map((_, i) => (
+                                            <Cell key={i} fill={DONUT_COLORS[i % DONUT_COLORS.length]} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip
+                                        formatter={(val: any) => [`${val} tasks`, '']}
+                                        contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #e2e8f0' }}
+                                    />
+                                </PieChart>
+                            </ResponsiveContainer>
+                            <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2 text-[10px] border-t border-slate-100 dark:border-slate-700/50 pt-3">
+                                {workloadByProject.map((entry, i) => (
+                                    <LegendDot key={i} color={DONUT_COLORS[i % DONUT_COLORS.length]} label={entry.project} />
+                                ))}
+                            </div>
+                        </>
+                    )}
+                </div>
+
+                {/* 3: Time Spent by Task Type (Vertical Bar Chart) */}
+                <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-5 shadow-sm flex flex-col justify-between">
+                    <h3 className="font-semibold text-slate-700 dark:text-slate-200 text-sm mb-4">
+                        Time Spent by Task Type
+                    </h3>
+                    {!timeByTaskType || timeByTaskType.length === 0 ? (
+                        <p className="text-xs text-slate-400 dark:text-slate-500 italic">No data.</p>
+                    ) : (
+                        <ResponsiveContainer width="100%" height={220}>
+                            <BarChart data={timeByTaskType} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                                <XAxis dataKey="taskCategory" tick={{ fontSize: 10, fill: '#94a3b8' }} tickFormatter={(val) => val.substring(0, 8) + (val.length > 8 ? '...' : '')} />
+                                <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} />
+                                <Tooltip
+                                    formatter={(val: any) => [`${val}h`, 'Hours']}
+                                    contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #e2e8f0' }}
+                                    cursor={{fill: 'rgba(99, 102, 241, 0.05)'}}
+                                />
+                                <Bar dataKey="hours" fill="#10B981" radius={[4, 4, 0, 0]} barSize={24}>
+                                    {timeByTaskType.map((_, i) => (
+                                        <Cell key={i} fill={DONUT_COLORS[i % DONUT_COLORS.length]} />
+                                    ))}
+                                </Bar>
+                            </BarChart>
+                        </ResponsiveContainer>
                     )}
                 </div>
             </div>
