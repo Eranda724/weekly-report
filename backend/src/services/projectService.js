@@ -1,9 +1,27 @@
 const prisma = require('../config/prisma');
 
-async function getAllProjects() {
+async function getAllProjects(user) {
+    const where = { isActive: true };
+    if (user && user.role !== 'ADMIN') {
+        where.projectMembers = {
+            some: {
+                userId: user.id
+            }
+        };
+    }
+
     return prisma.project.findMany({
-        where: { isActive: true },
+        where,
         orderBy: { name: 'asc' },
+        include: {
+            projectMembers: {
+                include: {
+                    user: {
+                        select: { id: true, name: true, email: true, role: true, isActive: true }
+                    }
+                }
+            }
+        }
     });
 }
 
@@ -26,4 +44,25 @@ async function deleteProject(id) {
     });
 }
 
-module.exports = { getAllProjects, createProject, updateProject, deleteProject };
+async function addProjectMember(projectId, userId) {
+    return prisma.projectMember.create({
+        data: { projectId, userId }
+    });
+}
+
+async function removeProjectMember(projectId, userId) {
+    return prisma.projectMember.delete({
+        where: {
+            projectId_userId: { projectId, userId }
+        }
+    });
+}
+
+module.exports = { 
+    getAllProjects, 
+    createProject, 
+    updateProject, 
+    deleteProject,
+    addProjectMember,
+    removeProjectMember
+};

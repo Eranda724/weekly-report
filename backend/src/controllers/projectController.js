@@ -3,11 +3,13 @@ const {
     createProject,
     updateProject,
     deleteProject,
+    addProjectMember,
+    removeProjectMember
 } = require('../services/projectService');
 
 async function list(req, res) {
     try {
-        const projects = await getAllProjects();
+        const projects = await getAllProjects(req.user);
         res.json(projects);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -45,4 +47,25 @@ async function remove(req, res) {
     }
 }
 
-module.exports = { list, create, update, remove };
+async function addMember(req, res) {
+    try {
+        const { userId } = req.body;
+        if (!userId) return res.status(400).json({ error: 'userId is required' });
+        const member = await addProjectMember(req.params.id, userId);
+        res.status(201).json(member);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+}
+
+async function removeMember(req, res) {
+    try {
+        const { userId } = req.params;
+        await removeProjectMember(req.params.id, userId);
+        res.status(204).send();
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+}
+
+module.exports = { list, create, update, remove, addMember, removeMember };

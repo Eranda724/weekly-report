@@ -60,7 +60,7 @@ async function getReportById(reportId, requestingUser) {
             tasks: true,
             highlights: true,
             hoursBreakdown: true,
-            project: true,
+            project: { include: { projectMembers: true } },
             user: { select: { id: true, name: true, email: true } },
             versions: { orderBy: { versionNumber: 'desc' } },
             reviewComments: { orderBy: { createdAt: 'desc' } },
@@ -73,11 +73,15 @@ async function getReportById(reportId, requestingUser) {
 
     // Role-aware access check, right here in the service layer
     const isOwner = report.userId === requestingUser.id;
-    const isManager = ['MANAGER', 'ADMIN'].includes(requestingUser.role);
+    const isAdmin = requestingUser.role === 'ADMIN';
+    const isManagerOfProject = requestingUser.role === 'MANAGER' && report.project.projectMembers.some(m => m.userId === requestingUser.id);
 
-    if (!isOwner && !isManager) {
+    if (!isOwner && !isAdmin && !isManagerOfProject) {
         throw new Error('Forbidden');
     }
+    
+    // Clean up projectMembers from response so it doesn't leak unnecessarily
+    delete report.project.projectMembers;
 
     return report;
 }
@@ -240,6 +244,14 @@ async function listAllReports(requestingUser, filters = {}) {
         ...(status ? { status } : {}),
         ...(weekStartDate ? { weekStartDate: new Date(weekStartDate) } : {}),
     };
+
+    if (requestingUser.role === 'MANAGER') {
+        where.project = {
+            projectMembers: {
+                some: { userId: requestingUser.id }
+            }
+        };
+    }
 
     const [reports, total] = await Promise.all([
         prisma.report.findMany({
