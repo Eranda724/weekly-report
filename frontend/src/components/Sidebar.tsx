@@ -11,9 +11,9 @@ type NavItem = {
 };
 
 const NAV_ITEMS: NavItem[] = [
-    { label: 'My Reports', href: '/reports', icon: '📋' },
-    { label: 'New Report', href: '/reports/new', icon: '✏️' },
-    { label: 'Profile', href: '/profile', icon: '👤' },
+    { label: 'My Reports', href: '/reports', icon: "/assets/report.png" },
+    { label: 'New Report', href: '/reports/new', icon: '/assets/add.png' },
+    { label: 'Profile', href: '/profile', icon: '/assets/user.png' },
 ];
 
 export default function Sidebar() {
@@ -57,8 +57,12 @@ export default function Sidebar() {
                                         }
                                     `}
                                 >
-                                    <span className={`text-base leading-none transition-transform duration-150 ${active ? 'scale-110' : ''}`}>
-                                        {item.icon}
+                                    <span className={`flex items-center justify-center transition-transform duration-150 ${active ? 'scale-110' : ''}`}>
+                                        {item.icon.startsWith('/') ? (
+                                            <img src={item.icon} alt={item.label} className="w-5 h-5 object-contain opacity-70 group-hover:opacity-100 dark:invert" />
+                                        ) : (
+                                            <span className="text-base leading-none">{item.icon}</span>
+                                        )}
                                     </span>
                                     {item.label}
                                     {active && (
@@ -78,7 +82,13 @@ export default function Sidebar() {
                     onClick={toggleTheme}
                     className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer bg-transparent border-none"
                 >
-                    <span className="text-base">{theme === 'light' ? '🌙' : '☀️'}</span>
+                    <span className="flex items-center justify-center">
+                        <img
+                            src={theme === 'light' ? '/assets/moon.png' : '/assets/sun.png'}
+                            alt="Theme toggle"
+                            className="w-5 h-5 object-contain opacity-70 group-hover:opacity-100 transition-opacity"
+                        />
+                    </span>
                     {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
                 </button>
 

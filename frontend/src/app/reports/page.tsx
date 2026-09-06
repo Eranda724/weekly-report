@@ -7,10 +7,10 @@ import { Report, ReportStatus } from '@/types/report';
 
 /* ─── Status config ────────────────────────────────── */
 const STATUS_CONFIG: Record<ReportStatus, { label: string; className: string }> = {
-    DRAFT:            { label: 'Draft',            className: 'bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300' },
-    SUBMITTED:        { label: 'Submitted',         className: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300' },
-    NEEDS_CORRECTION: { label: 'Needs Correction',  className: 'bg-amber-100  text-amber-700  dark:bg-amber-900/50  dark:text-amber-300' },
-    APPROVED:         { label: 'Approved',           className: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300' },
+    DRAFT: { label: 'Draft', className: 'bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300' },
+    SUBMITTED: { label: 'Submitted', className: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300' },
+    NEEDS_CORRECTION: { label: 'Needs Correction', className: 'bg-amber-100  text-amber-700  dark:bg-amber-900/50  dark:text-amber-300' },
+    APPROVED: { label: 'Approved', className: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300' },
 };
 
 function weekRange(startDateStr: string): string {
@@ -67,10 +67,11 @@ export default function ReportHistoryPage() {
     });
 
     const counts = {
-        total:     reports.length,
-        draft:     reports.filter((r) => r.status === 'DRAFT').length,
+        total: reports.length,
+        draft: reports.filter((r) => r.status === 'DRAFT').length,
         submitted: reports.filter((r) => r.status === 'SUBMITTED').length,
-        approved:  reports.filter((r) => r.status === 'APPROVED').length,
+        approved: reports.filter((r) => r.status === 'APPROVED').length,
+        needsCorrection: reports.filter((r) => r.status === 'NEEDS_CORRECTION').length,
     };
 
     return (
@@ -87,19 +88,20 @@ export default function ReportHistoryPage() {
                         href="/reports/new"
                         className="bg-gradient-to-r from-indigo-500 to-violet-600 hover:from-indigo-600 hover:to-violet-700 text-white text-sm font-semibold px-4 py-2 rounded-lg shadow-md shadow-indigo-200 dark:shadow-indigo-900/30 transition-all duration-150 no-underline"
                     >
-                        + New Report
+                        New Report
                     </Link>
                 </div>
 
                 <main className="px-6 py-4">
 
                     {/* ── Stats Strip ── */}
-                    <div className="grid grid-cols-4 gap-3 mb-7">
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-7">
                         {[
-                            { label: 'Total',     value: counts.total,     color: 'text-indigo-600 dark:text-indigo-400' },
-                            { label: 'Draft',     value: counts.draft,     color: 'text-slate-500  dark:text-slate-400'  },
+                            { label: 'Needs Correction', value: counts.needsCorrection, color: 'text-amber-600 dark:text-amber-400' },
+                            { label: 'Draft', value: counts.draft, color: 'text-slate-500  dark:text-slate-400' },
                             { label: 'Submitted', value: counts.submitted, color: 'text-violet-600 dark:text-violet-400' },
-                            { label: 'Approved',  value: counts.approved,  color: 'text-emerald-600 dark:text-emerald-400' },
+                            { label: 'Approved', value: counts.approved, color: 'text-emerald-600 dark:text-emerald-400' },
+                            { label: 'Total', value: counts.total, color: 'text-indigo-600 dark:text-indigo-400' },
                         ].map((stat) => (
                             <div
                                 key={stat.label}
@@ -181,7 +183,7 @@ export default function ReportHistoryPage() {
                                 <h2 className="font-semibold text-slate-700 dark:text-slate-200 text-sm">Your Reports</h2>
                                 <span className="text-xs text-slate-400 dark:text-slate-500">{sorted.length} result{sorted.length !== 1 ? 's' : ''}</span>
                             </div>
-                            
+
                             {sorted.map((report, i) => (
                                 <Link
                                     key={report.id}

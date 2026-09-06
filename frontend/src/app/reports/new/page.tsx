@@ -34,7 +34,7 @@ export default function NewReportPage() {
                     {/* Page header */}
                     <div className="pt-10 pb-8">
                         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 text-xs font-semibold tracking-wide mb-4 shadow-sm border border-indigo-200 dark:border-indigo-800/50">
-                            <span>📝</span> Draft Mode
+                            Draft Mode
                         </div>
                         <h1 className="text-3xl font-extrabold text-slate-800 dark:text-slate-100 tracking-tight">New Weekly Report</h1>
                         <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">

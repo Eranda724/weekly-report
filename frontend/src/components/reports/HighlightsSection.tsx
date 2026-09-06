@@ -7,14 +7,14 @@ type Props = {
 };
 
 const SECTION_CFG = {
-    BLOCKER:     { icon: '🚧', label: 'Blockers / Challenges',    addLabel: '+ Add Blocker',     placeholder: 'Describe this blocker or challenge…',   border: 'border-l-red-400',   addCls: 'border-red-400   text-red-500   dark:text-red-400   hover:bg-red-50   dark:hover:bg-red-900/20',   starColor: 'text-red-400' },
-    ACHIEVEMENT: { icon: '🏆', label: 'Achievements / Highlights', addLabel: '+ Add Achievement', placeholder: 'Describe this achievement or highlight…', border: 'border-l-emerald-400', addCls: 'border-emerald-400 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20', starColor: 'text-emerald-500' },
+    BLOCKER: { label: 'Blockers', addLabel: 'Add Blocker', placeholder: 'Describe this blocker or challenge…', border: 'border-l-red-400', addCls: 'border-red-400   text-red-500   dark:text-red-400   hover:bg-red-50   dark:hover:bg-red-900/20', starColor: 'text-red-400' },
+    ACHIEVEMENT: { label: 'Achievements', addLabel: 'Add Achievement', placeholder: 'Describe this achievement or highlight…', border: 'border-l-emerald-400', addCls: 'border-emerald-400 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20', starColor: 'text-emerald-500' },
 };
 
 const inputCls = 'flex-1 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 text-sm px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition resize-y placeholder-slate-400 dark:placeholder-slate-500';
 
 export default function HighlightsSection({ highlights, onChange }: Props) {
-    const blockers     = highlights.filter((h) => h.itemType === 'BLOCKER');
+    const blockers = highlights.filter((h) => h.itemType === 'BLOCKER');
     const achievements = highlights.filter((h) => h.itemType === 'ACHIEVEMENT');
 
     function addItem(type: HighlightType) {
@@ -37,7 +37,7 @@ export default function HighlightsSection({ highlights, onChange }: Props) {
                 {/* Header */}
                 <div className="flex items-center justify-between mb-3">
                     <span className="text-sm font-semibold text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
-                        {cfg.icon} {cfg.label}
+                        {cfg.label}
                     </span>
                     <button
                         type="button"
@@ -85,7 +85,7 @@ export default function HighlightsSection({ highlights, onChange }: Props) {
                             </div>
                             {item.isKeyItem && (
                                 <p className={`text-[0.68rem] font-semibold mt-1.5 ml-7 ${cfg.starColor}`}>
-                                    ★ Key {type === 'BLOCKER' ? 'Blocker' : 'Achievement'} this week
+                                    Key {type === 'BLOCKER' ? 'Blocker' : 'Achievement'} this week
                                 </p>
                             )}
                         </div>
@@ -97,7 +97,7 @@ export default function HighlightsSection({ highlights, onChange }: Props) {
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {renderList('BLOCKER',     blockers)}
+            {renderList('BLOCKER', blockers)}
             {renderList('ACHIEVEMENT', achievements)}
         </div>
     );

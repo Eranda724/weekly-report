@@ -9,10 +9,10 @@ import { reportsApi, managerReportsApi } from '@/lib/api';
 import { Report, ReportStatus } from '@/types/report';
 
 const STATUS_CONFIG: Record<ReportStatus, { label: string; cls: string }> = {
-    DRAFT:            { label: 'Draft',            cls: 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300' },
-    SUBMITTED:        { label: 'Submitted',         cls: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300' },
-    NEEDS_CORRECTION: { label: 'Needs Correction',  cls: 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300' },
-    APPROVED:         { label: 'Approved',           cls: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300' },
+    DRAFT: { label: 'Draft', cls: 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300' },
+    SUBMITTED: { label: 'Submitted', cls: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300' },
+    NEEDS_CORRECTION: { label: 'Needs Correction', cls: 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300' },
+    APPROVED: { label: 'Approved', cls: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300' },
 };
 
 export default function ProfilePage() {
@@ -22,29 +22,29 @@ export default function ProfilePage() {
 
     useEffect(() => {
         if (!user) return;
-        
+
         if (user.role === 'MANAGER' || user.role === 'ADMIN') {
             managerReportsApi.listAll({ pageSize: 100 })
                 .then((res) => {
                     const sorted = res.reports.sort((a, b) => new Date((b as any).updatedAt || (b as any).createdAt).getTime() - new Date((a as any).updatedAt || (a as any).createdAt).getTime());
                     setReports(sorted);
                 })
-                .catch(() => {})
+                .catch(() => { })
                 .finally(() => setLoading(false));
         } else {
             reportsApi
                 .listMine({ pageSize: 100 })
                 .then((res) => setReports(res.reports))
-                .catch(() => {})
+                .catch(() => { })
                 .finally(() => setLoading(false));
         }
     }, [user]);
 
     const stats = {
-        total:     reports.length,
-        approved:  reports.filter((r) => r.status === 'APPROVED').length,
+        total: reports.length,
+        approved: reports.filter((r) => r.status === 'APPROVED').length,
         submitted: reports.filter((r) => r.status === 'SUBMITTED').length,
-        draft:     reports.filter((r) => r.status === 'DRAFT').length,
+        draft: reports.filter((r) => r.status === 'DRAFT').length,
     };
 
     const approvalRate = stats.total > 0
@@ -110,13 +110,13 @@ export default function ProfilePage() {
                         {user?.role === 'TEAM_MEMBER' && (
                             <div className="grid grid-cols-4 gap-3">
                                 {[
-                                    { label: 'Total Reports', value: stats.total,     color: 'text-indigo-600 dark:text-indigo-400',   icon: '📋' },
-                                    { label: 'Approved',       value: stats.approved,  color: 'text-emerald-600 dark:text-emerald-400', icon: '✅' },
-                                    { label: 'Submitted',      value: stats.submitted, color: 'text-violet-600 dark:text-violet-400',   icon: '📤' },
-                                    { label: 'Drafts',         value: stats.draft,     color: 'text-slate-500 dark:text-slate-400',     icon: '✏️' },
+                                    { label: 'Total Reports', value: stats.total, color: 'text-indigo-600 dark:text-indigo-400' },
+                                    { label: 'Approved', value: stats.approved, color: 'text-emerald-600 dark:text-emerald-400' },
+                                    { label: 'Submitted', value: stats.submitted, color: 'text-violet-600 dark:text-violet-400' },
+                                    { label: 'Drafts', value: stats.draft, color: 'text-slate-500 dark:text-slate-400' },
                                 ].map((s) => (
                                     <div key={s.label} className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-4 shadow-sm text-center">
-                                        <div className="text-2xl mb-1">{s.icon}</div>
+                                        <div className="text-2xl mb-1"></div>
                                         <div className={`text-2xl font-extrabold ${s.color}`}>{s.value}</div>
                                         <div className="text-xs text-slate-400 dark:text-slate-500 mt-0.5 font-medium">{s.label}</div>
                                     </div>
