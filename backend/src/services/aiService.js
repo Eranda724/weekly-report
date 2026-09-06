@@ -6,9 +6,13 @@ const model = genAI.getGenerativeModel({ model: 'gemini-3.6-flash' });
 
 // Gathers a lightweight, privacy-conscious snapshot of team data for a given week
 async function getTeamContext(weekStartDate) {
-    const where = weekStartDate
-        ? { weekStartDate: { gte: new Date(weekStartDate) } }
-        : {};
+    let where = {};
+    if (weekStartDate) {
+        const start = new Date(weekStartDate);
+        const end = new Date(weekStartDate);
+        end.setDate(end.getDate() + 7);
+        where = { weekStartDate: { gte: start, lt: end } };
+    }
 
     const reports = await prisma.report.findMany({
         where,
