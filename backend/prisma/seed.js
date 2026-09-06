@@ -90,7 +90,7 @@ async function main() {
                 priority: randomFrom(['LOW', 'MEDIUM', 'HIGH']),
                 plannedPct: 100,
                 actualPct: 60 + Math.floor(Math.random() * 41),
-                status: randomFrom(['Completed', 'In Progress', 'Completed']),
+                status: randomFrom(['COMPLETED', 'IN_PROGRESS', 'COMPLETED']),
                 timePlannedHrs: 4 + Math.floor(Math.random() * 6),
                 timeSpentHrs: 3 + Math.floor(Math.random() * 6),
                 deliverable: 'Delivered as planned',

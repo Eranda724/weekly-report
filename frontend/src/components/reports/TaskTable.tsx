@@ -23,7 +23,12 @@ const PRIORITY_CLS: Record<Priority, string> = {
     LOW:    'bg-sky-100   text-sky-700   dark:bg-sky-900/40   dark:text-sky-300',
 };
 
-const STATUS_OPTIONS = ['In Progress', 'Done', 'Blocked', 'Pending'];
+const STATUS_OPTIONS = [
+    { value: 'IN_PROGRESS', label: 'In Progress' },
+    { value: 'COMPLETED', label: 'Completed' },
+    { value: 'BLOCKED', label: 'Blocked' },
+    { value: 'NOT_STARTED', label: 'Not Started' }
+];
 
 const inputCls = 'w-full rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 text-xs px-2 py-1.5 outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition';
 
@@ -75,7 +80,7 @@ export default function TaskTable({ tasks, onChange }: Props) {
                                     className={inputCls}
                                 >
                                     <option value="">— Status —</option>
-                                    {STATUS_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
+                                    {STATUS_OPTIONS.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
                                 </select>
                             </div>
                             <button
