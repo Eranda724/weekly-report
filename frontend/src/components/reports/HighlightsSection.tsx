@@ -4,6 +4,7 @@ import { ReportHighlight, HighlightType } from '@/types/report';
 type Props = {
     highlights: ReportHighlight[];
     onChange: (highlights: ReportHighlight[]) => void;
+    filterType?: HighlightType;
 };
 
 const SECTION_CFG = {
@@ -13,7 +14,7 @@ const SECTION_CFG = {
 
 const inputCls = 'flex-1 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 text-sm px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition resize-y placeholder-slate-400 dark:placeholder-slate-500';
 
-export default function HighlightsSection({ highlights, onChange }: Props) {
+export default function HighlightsSection({ highlights, onChange, filterType }: Props) {
     const blockers = highlights.filter((h) => h.itemType === 'BLOCKER');
     const achievements = highlights.filter((h) => h.itemType === 'ACHIEVEMENT');
 
@@ -93,6 +94,13 @@ export default function HighlightsSection({ highlights, onChange }: Props) {
                 </div>
             </div>
         );
+    }
+
+    if (filterType === 'BLOCKER') {
+        return <div className="flex-1 flex flex-col">{renderList('BLOCKER', blockers)}</div>;
+    }
+    if (filterType === 'ACHIEVEMENT') {
+        return <div className="flex-1 flex flex-col">{renderList('ACHIEVEMENT', achievements)}</div>;
     }
 
     return (

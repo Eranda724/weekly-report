@@ -13,19 +13,14 @@ type Props = {
     saveLabel: string;
 };
 
-// Updated SectionCard to support both light and dark modes
-function SectionCard({ num, title, children }: { num: number; title: string; children: React.ReactNode }) {
+function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
     return (
         <div className="bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-700/50 rounded-xl p-5 mb-5 shadow-sm">
-            <div className="flex items-center gap-3 mb-4 pb-3 border-b border-slate-100 dark:border-slate-700/50">
-                {/* Number badge matching the purple avatar circles from the image */}
-                <span className="w-8 h-8 rounded-full bg-violet-600 text-white text-sm font-semibold flex items-center justify-center shrink-0 shadow-md">
-                    {num}
-                </span>
-                <span className="font-medium text-slate-800 dark:text-slate-200 text-base tracking-wide">
+            {title && (
+                <h3 className="text-base font-semibold text-slate-800 dark:text-slate-200 mb-4 pb-3 border-b border-slate-100 dark:border-slate-700/50">
                     {title}
-                </span>
-            </div>
+                </h3>
+            )}
             {children}
         </div>
     );
@@ -76,7 +71,7 @@ export default function ReportForm({ initialData, onSave, saveLabel }: Props) {
             )}
 
             {/* Section 1 — Week & Project */}
-            <SectionCard num={1} title="Week & Project">
+            <SectionCard title="Week & Project">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label className={labelCls}>
@@ -110,22 +105,32 @@ export default function ReportForm({ initialData, onSave, saveLabel }: Props) {
             </SectionCard>
 
             {/* Section 2 — Tasks (Full width) */}
-            <SectionCard num={2} title="Tasks Completed This Week">
+            <SectionCard title="Tasks Completed This Week">
                 <TaskTable tasks={form.tasks} onChange={(tasks) => updateField('tasks', tasks)} />
             </SectionCard>
 
-            {/* Section 3 — Blockers & Achievements (Full width) */}
-            <SectionCard num={3} title="Blockers & Achievements">
-                <HighlightsSection
-                    highlights={form.highlights}
-                    onChange={(highlights) => updateField('highlights', highlights)}
-                />
-            </SectionCard>
+            {/* Section 3 & 4 — Blockers & Achievements side by side */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <SectionCard title="Blockers">
+                    <HighlightsSection
+                        filterType="BLOCKER"
+                        highlights={form.highlights}
+                        onChange={(highlights) => updateField('highlights', highlights)}
+                    />
+                </SectionCard>
+                <SectionCard title="Achievements">
+                    <HighlightsSection
+                        filterType="ACHIEVEMENT"
+                        highlights={form.highlights}
+                        onChange={(highlights) => updateField('highlights', highlights)}
+                    />
+                </SectionCard>
+            </div>
 
             {/* Row: Hours and Plans side by side */}
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
                 {/* Section 4 — Hours Breakdown */}
-                <SectionCard num={4} title="Hours Worked by Task Type">
+                <SectionCard title="Hours Worked by Task Type">
                     <HoursBreakdownSection
                         entries={form.hoursBreakdown}
                         onChange={(hoursBreakdown) => updateField('hoursBreakdown', hoursBreakdown)}
@@ -133,7 +138,7 @@ export default function ReportForm({ initialData, onSave, saveLabel }: Props) {
                 </SectionCard>
 
                 {/* Section 5 — Next Week + Notes */}
-                <SectionCard num={5} title="Plans & Notes">
+                <SectionCard title="Plans & Notes">
                     <div className="flex flex-col gap-5">
                         <div>
                             <label className={labelCls}>

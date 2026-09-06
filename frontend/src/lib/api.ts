@@ -25,10 +25,21 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
   return res.json();
 }
 
+export type ProjectMember = {
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+    isActive: boolean;
+  };
+};
+
 export type Project = {
   id: string;
   name: string;
   isActive: boolean;
+  projectMembers?: ProjectMember[];
 };
 
 export const projectsApi = {
@@ -39,6 +50,10 @@ export const projectsApi = {
     apiFetch(`/projects/${id}`, { method: 'PUT', body: JSON.stringify({ name }) }),
   remove: (id: string): Promise<void> =>
     apiFetch(`/projects/${id}`, { method: 'DELETE' }),
+  addMember: (projectId: string, userId: string): Promise<any> =>
+    apiFetch(`/projects/${projectId}/members`, { method: 'POST', body: JSON.stringify({ userId }) }),
+  removeMember: (projectId: string, userId: string): Promise<void> =>
+    apiFetch(`/projects/${projectId}/members/${userId}`, { method: 'DELETE' }),
 };
 
 export const reportsApi = {
