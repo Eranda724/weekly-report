@@ -49,9 +49,9 @@ export default function AIChatWidget({ weekStartDate }: { weekStartDate?: string
         return (
             <button
                 onClick={() => setOpen(true)}
-                className="fixed bottom-6 right-6 z-50 bg-violet-600 hover:bg-violet-500 text-white rounded-full pl-2 pr-5 py-2 shadow-lg shadow-violet-900/30 text-sm font-semibold transition-all flex items-center gap-2.5 border border-violet-500"
+                className="fixed bottom-6 right-6 z-50 bg-violet-600 hover:bg-violet-500 text-white rounded-full px-5 py-2.5 shadow-lg shadow-violet-900/30 text-sm font-semibold transition-all flex items-center gap-2 border border-violet-500 cursor-pointer"
             >
-                <img src="/assets/robot.png" alt="AI" className="w-8 h-8 rounded-full object-cover bg-violet-800" />
+                <img src="/assets/robot.png" alt="AI" className="w-8 h-8" />
                 Ask AI
             </button>
         );
@@ -95,11 +95,10 @@ export default function AIChatWidget({ weekStartDate }: { weekStartDate?: string
                             <img src="/assets/robot.png" alt="AI" className="w-6 h-6 rounded-full object-cover shrink-0 mb-0.5 ring-1 ring-violet-400/30" />
                         )}
                         <div
-                            className={`text-sm px-3.5 py-2.5 rounded-2xl max-w-[80%] whitespace-pre-wrap leading-relaxed ${
-                                m.role === 'user'
+                            className={`text-sm px-3.5 py-2.5 rounded-2xl max-w-[80%] whitespace-pre-wrap leading-relaxed ${m.role === 'user'
                                     ? 'bg-violet-600 text-white rounded-br-sm shadow-sm'
                                     : 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-bl-sm'
-                            }`}
+                                }`}
                         >
                             {m.text}
                         </div>
@@ -147,4 +146,4 @@ export default function AIChatWidget({ weekStartDate }: { weekStartDate?: string
         </div>
     );
 }
-
+
