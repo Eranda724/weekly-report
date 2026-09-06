@@ -171,7 +171,7 @@ export default function ReportDetailPage() {
                                 <span className={`px-4 py-1.5 text-xs font-bold uppercase tracking-wider rounded-full border ${statusBadgeColors[report.status] || statusBadgeColors.DRAFT}`}>
                                     {report.status.replace('_', ' ')}
                                 </span>
-                                
+
                                 {report.versions && report.versions.length > 0 && (
                                     <div className="flex flex-col items-center sm:items-end gap-1 mt-1">
                                         <label className="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 font-bold">History</label>
@@ -288,7 +288,7 @@ export default function ReportDetailPage() {
                             {/* Blockers */}
                             <div className="bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 rounded-3xl overflow-hidden shadow-sm h-full flex flex-col">
                                 <div className="px-5 py-3 border-b border-red-100 dark:border-red-900/30 bg-red-100/50 dark:bg-red-900/20 flex items-center gap-2">
-                                    <span className="text-lg">🚩</span>
+                                    <span className="text-lg"></span>
                                     <h3 className="font-semibold text-red-800 dark:text-red-400">Blockers</h3>
                                 </div>
                                 <div className="p-5 space-y-3 flex-1">
@@ -298,7 +298,6 @@ export default function ReportDetailPage() {
                                         <div key={i} className="flex gap-2 items-start text-sm text-red-700 dark:text-red-300">
                                             <div className="mt-0.5">•</div>
                                             <p>
-                                                {h.isKeyItem && <span className="font-bold text-red-800 dark:text-red-400 mr-1">[KEY]</span>}
                                                 {h.description}
                                             </p>
                                         </div>
@@ -309,7 +308,7 @@ export default function ReportDetailPage() {
                             {/* Achievements */}
                             <div className="bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-900/30 rounded-3xl overflow-hidden shadow-sm h-full flex flex-col">
                                 <div className="px-5 py-3 border-b border-emerald-100 dark:border-emerald-900/30 bg-emerald-100/50 dark:bg-emerald-900/20 flex items-center gap-2">
-                                    <span className="text-lg">⭐</span>
+                                    <span className="text-lg"></span>
                                     <h3 className="font-semibold text-emerald-800 dark:text-emerald-400">Achievements</h3>
                                 </div>
                                 <div className="p-5 space-y-3 flex-1">
@@ -319,7 +318,6 @@ export default function ReportDetailPage() {
                                         <div key={i} className="flex gap-2 items-start text-sm text-emerald-700 dark:text-emerald-300">
                                             <div className="mt-0.5">•</div>
                                             <p>
-                                                {h.isKeyItem && <span className="font-bold text-emerald-800 dark:text-emerald-400 mr-1">[KEY]</span>}
                                                 {h.description}
                                             </p>
                                         </div>

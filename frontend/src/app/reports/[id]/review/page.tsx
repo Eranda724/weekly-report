@@ -10,10 +10,10 @@ export default function ManagerReviewPage() {
     const { id } = useParams<{ id: string }>();
     const router = useRouter();
     const { theme, toggleTheme } = useTheme();
-    
+
     const [report, setReport] = useState<Report | null>(null);
     const [selectedVersionId, setSelectedVersionId] = useState<string>('latest');
-    
+
     const [comment, setComment] = useState('');
     const [error, setError] = useState('');
     const [submitting, setSubmitting] = useState(false);
@@ -44,7 +44,7 @@ export default function ManagerReviewPage() {
     };
 
     const isLatest = selectedVersionId === 'latest';
-    
+
     // Parse snapshot if an older version is selected
     const activeSnapshot = useMemo(() => {
         if (isLatest || !report) return null;
@@ -61,7 +61,7 @@ export default function ManagerReviewPage() {
 
     // Derive display data based on version selected
     const displayTasks = isLatest ? report?.tasks || [] : activeSnapshot?.tasks || [];
-    const displayBlockers = isLatest 
+    const displayBlockers = isLatest
         ? report?.highlights?.filter((h) => h.itemType === 'BLOCKER') || []
         : activeSnapshot?.highlights?.filter((h: any) => h.itemType === 'BLOCKER') || [];
     const displayAchievements = isLatest
@@ -103,7 +103,7 @@ export default function ManagerReviewPage() {
                     Review Report
                 </h1>
             </div>
-            
+
             <div className="flex items-center gap-3">
                 <div className="hidden sm:flex gap-2 mr-2">
                     <button onClick={scrollToDecision} className="px-3 py-1.5 text-xs font-semibold rounded-md border border-emerald-500 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition-colors">
@@ -161,7 +161,7 @@ export default function ManagerReviewPage() {
                     {TopBar}
 
                     <div className="px-6 py-8 space-y-6">
-                        
+
                         {/* ── Header Card ── */}
                         <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col sm:flex-row items-center gap-5 relative overflow-hidden">
                             <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-indigo-500/10 to-transparent rounded-bl-full pointer-events-none" />
@@ -180,13 +180,13 @@ export default function ManagerReviewPage() {
                             {/* Version Dropdown replacing SUBMITTED badge */}
                             <div className="flex flex-col items-center sm:items-end gap-1 relative z-10">
                                 <label className="text-xs text-slate-500 dark:text-slate-400 font-medium">Version History</label>
-                                <select 
+                                <select
                                     value={selectedVersionId}
                                     onChange={(e) => setSelectedVersionId(e.target.value)}
                                     className="bg-indigo-50 dark:bg-slate-900 text-indigo-700 dark:text-indigo-400 font-semibold text-sm rounded-lg px-3 py-1.5 border border-indigo-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer shadow-sm"
                                 >
                                     <option value="latest">Latest Version</option>
-                                    {report.versions?.sort((a,b) => b.versionNumber - a.versionNumber).map(v => (
+                                    {report.versions?.sort((a, b) => b.versionNumber - a.versionNumber).map(v => (
                                         <option key={v.id} value={v.id}>
                                             v{v.versionNumber} ({new Date(v.submittedAt).toLocaleDateString()})
                                         </option>
@@ -268,7 +268,7 @@ export default function ManagerReviewPage() {
                             {/* Blockers */}
                             <div className="bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 rounded-3xl overflow-hidden shadow-sm h-full flex flex-col">
                                 <div className="px-5 py-3 border-b border-red-100 dark:border-red-900/30 bg-red-100/50 dark:bg-red-900/20 flex items-center gap-2">
-                                    <span className="text-lg">🚩</span>
+                                    <span className="text-lg"></span>
                                     <h3 className="font-semibold text-red-800 dark:text-red-400">Blockers</h3>
                                 </div>
                                 <div className="p-5 space-y-3 flex-1">
@@ -278,7 +278,6 @@ export default function ManagerReviewPage() {
                                         <div key={i} className="flex gap-2 items-start text-sm text-red-700 dark:text-red-300">
                                             <div className="mt-0.5">•</div>
                                             <p>
-                                                {h.isKeyItem && <span className="font-bold text-red-800 dark:text-red-400 mr-1">[KEY]</span>}
                                                 {h.description}
                                             </p>
                                         </div>
@@ -289,7 +288,7 @@ export default function ManagerReviewPage() {
                             {/* Achievements */}
                             <div className="bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-900/30 rounded-3xl overflow-hidden shadow-sm h-full flex flex-col">
                                 <div className="px-5 py-3 border-b border-emerald-100 dark:border-emerald-900/30 bg-emerald-100/50 dark:bg-emerald-900/20 flex items-center gap-2">
-                                    <span className="text-lg">⭐</span>
+                                    <span className="text-lg"></span>
                                     <h3 className="font-semibold text-emerald-800 dark:text-emerald-400">Achievements</h3>
                                 </div>
                                 <div className="p-5 space-y-3 flex-1">
@@ -299,7 +298,6 @@ export default function ManagerReviewPage() {
                                         <div key={i} className="flex gap-2 items-start text-sm text-emerald-700 dark:text-emerald-300">
                                             <div className="mt-0.5">•</div>
                                             <p>
-                                                {h.isKeyItem && <span className="font-bold text-emerald-800 dark:text-emerald-400 mr-1">[KEY]</span>}
                                                 {h.description}
                                             </p>
                                         </div>
@@ -348,14 +346,14 @@ export default function ManagerReviewPage() {
                                     disabled={submitting || !isLatest}
                                     className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-medium py-2.5 rounded-xl transition-all shadow-sm disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                 >
-                                    {submitting ? '...' : '✅ Approve'}
+                                    {submitting ? '...' : 'Approve'}
                                 </button>
                                 <button
                                     onClick={() => handleDecision('NEEDS_CORRECTION')}
                                     disabled={submitting || !isLatest}
                                     className="flex-1 border-2 border-amber-500 text-amber-600 dark:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/20 font-medium py-2 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                 >
-                                    {submitting ? '...' : '❗ Request Changes'}
+                                    {submitting ? '...' : 'Request Changes'}
                                 </button>
                             </div>
                         </div>
