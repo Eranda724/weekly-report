@@ -46,6 +46,14 @@ export default function ReportForm({ initialData, onSave, saveLabel }: Props) {
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
+        await save();
+    }
+
+    async function handleDraftSave() {
+        await save();
+    }
+
+    async function save() {
         setError('');
         if (!form.projectId || !form.weekStartDate) {
             setError('Project and week are required.');
@@ -172,6 +180,7 @@ export default function ReportForm({ initialData, onSave, saveLabel }: Props) {
             <div className="flex items-center justify-end gap-4 pt-2 pb-10">
                 <button
                     type="button"
+                    onClick={handleDraftSave}
                     disabled={saving}
                     className="bg-white dark:bg-transparent border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 font-medium text-sm px-6 py-2.5 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors disabled:opacity-50 cursor-pointer shadow-sm dark:shadow-none"
                 >
