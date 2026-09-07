@@ -216,7 +216,6 @@ export default function ReportDetailPage() {
                         {activeVersionComment && activeVersionComment.decision === 'NEEDS_CORRECTION' && (
                             <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-300 dark:border-amber-700/50 rounded-3xl p-6 shadow-sm">
                                 <div className="flex items-start gap-3">
-                                    <div className="text-xl">⚠️</div>
                                     <div>
                                         <h3 className="font-bold text-amber-800 dark:text-amber-400 mb-1">Manager requested changes</h3>
                                         <p className="text-sm text-amber-900 dark:text-amber-200/90 whitespace-pre-wrap">{activeVersionComment.commentText}</p>
@@ -229,13 +228,12 @@ export default function ReportDetailPage() {
                         {((isLatest && report.status === 'APPROVED') || (!isLatest && activeVersionComment?.decision === 'APPROVED')) && (
                             <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-300 dark:border-emerald-700/50 rounded-3xl p-6 shadow-sm flex flex-col gap-1">
                                 <div className="flex items-center gap-3">
-                                    <div className="text-xl">✅</div>
                                     <h3 className="font-bold text-emerald-800 dark:text-emerald-400">
                                         Approved{activeVersionComment?.createdAt ? ` on ${new Date(activeVersionComment.createdAt).toLocaleDateString()}` : ''}
                                     </h3>
                                 </div>
                                 {activeVersionComment?.commentText && (
-                                     <p className="text-sm text-emerald-900 dark:text-emerald-200/90 whitespace-pre-wrap ml-9">{activeVersionComment.commentText}</p>
+                                    <p className="text-sm text-emerald-900 dark:text-emerald-200/90 whitespace-pre-wrap ml-9">{activeVersionComment.commentText}</p>
                                 )}
                             </div>
                         )}
@@ -243,7 +241,6 @@ export default function ReportDetailPage() {
                         {/* Tasks Section */}
                         <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl overflow-hidden shadow-sm">
                             <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 flex items-center gap-2">
-                                <span className="text-lg">📋</span>
                                 <h3 className="font-semibold text-slate-800 dark:text-slate-100">Tasks Completed</h3>
                             </div>
                             <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -339,7 +336,7 @@ export default function ReportDetailPage() {
                         {/* Next Week (Full Width) */}
                         <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl overflow-hidden shadow-sm flex flex-col">
                             <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 flex items-center gap-2">
-                                <span className="text-lg">⏭️</span>
+
                                 <h3 className="font-semibold text-slate-800 dark:text-slate-100">Plans for Next Week</h3>
                             </div>
                             <div className="p-6 flex-1">
@@ -364,14 +361,14 @@ export default function ReportDetailPage() {
                                         href={`/reports/${id}/edit`}
                                         className={`flex-1 border-2 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 font-medium py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 ${!isLatest ? 'pointer-events-none opacity-50' : ''}`}
                                     >
-                                        ✏️ Edit Report
+                                        Edit Report
                                     </Link>
                                     <button
                                         onClick={handleSubmit}
                                         disabled={submitting || !isLatest}
                                         className="flex-1 bg-gradient-to-r from-indigo-500 to-violet-600 hover:from-indigo-600 hover:to-violet-700 text-white font-medium py-2.5 rounded-xl transition-all shadow-sm disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                     >
-                                        {submitting ? '...' : report.status === 'NEEDS_CORRECTION' ? '🚀 Resubmit' : '🚀 Submit for Review'}
+                                        {submitting ? '...' : report.status === 'NEEDS_CORRECTION' ? 'Resubmit' : 'Submit for Review'}
                                     </button>
                                 </div>
                             </div>

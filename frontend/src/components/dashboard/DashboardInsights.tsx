@@ -220,41 +220,75 @@ export default function DashboardInsights({ weekStartDate }: { weekStartDate?: s
 
             {/* ── Bottom row: 3 distinct charts ── */}
             <div className="grid grid-cols-3 gap-5">
-                {/* 1: Status by Member (Horizontal Bar Chart) */}
-                <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-5 shadow-sm flex flex-col justify-between">
-                    <h3 className="font-semibold text-slate-700 dark:text-slate-200 text-sm mb-4">
+                {/* 1: Status by Member – compact 4-week color bar grid */}
+                <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-5 shadow-sm flex flex-col">
+                    <h3 className="font-semibold text-slate-700 dark:text-slate-200 text-sm mb-3">
                         Report Submission Status
                     </h3>
                     {statusByMember.length === 0 ? (
                         <p className="text-xs text-slate-400 dark:text-slate-500 italic">No data.</p>
-                    ) : (
-                        <ResponsiveContainer width="100%" height={220}>
-                            <BarChart data={statusByMember} layout="vertical" margin={{ top: 0, right: 10, left: 10, bottom: 0 }}>
-                                <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#e2e8f0" />
-                                <XAxis type="number" hide />
-                                <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: '#94a3b8' }} width={80} tickFormatter={(val) => val.split(' ')[0]} />
-                                <Tooltip 
-                                    contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #e2e8f0' }} 
-                                    cursor={{fill: 'rgba(99, 102, 241, 0.05)'}}
-                                    formatter={(value: any, name: any, props: any) => {
-                                        const statuses = props.payload.statuses;
-                                        const latestStatus = statuses[statuses.length - 1]?.status || 'NOT_STARTED';
-                                        return [latestStatus.replace('_', ' '), 'Status'];
-                                    }}
-                                />
-                                <Bar dataKey={() => 1} fill="#e2e8f0" radius={[0, 4, 4, 0]} barSize={20}>
-                                    {statusByMember.map((entry, i) => {
-                                        const statuses = entry.statuses || [];
-                                        const lastStatus = statuses[statuses.length - 1]?.status || 'NOT_STARTED';
-                                        return <Cell key={i} fill={STATUS_COLORS[lastStatus] || STATUS_COLORS.NOT_STARTED} />;
-                                    })}
-                                </Bar>
-                            </BarChart>
-                        </ResponsiveContainer>
-                    )}
-                    <div className="flex flex-wrap gap-x-3 gap-y-1 mt-4 text-[10px] font-medium tracking-wide border-t border-slate-100 dark:border-slate-700/50 pt-3">
+                    ) : (() => {
+                        const weeks: string[] = statusByMember[0]?.statuses?.map((s: any) => s.week) ?? [];
+                        const lastWeekIdx = weeks.length - 1;
+
+                        const WEEK_LABELS = ['2w ago', '1w ago', 'last week', 'This week'];
+                        const STATUS_LABEL: Record<string, string> = {
+                            APPROVED: 'Approved',
+                            SUBMITTED: 'Submitted',
+                            NEEDS_CORRECTION: 'Needs Fix',
+                            DRAFT: 'Draft',
+                            NOT_STARTED: 'Not Started',
+                        };
+
+                        return (
+                            <div className="flex flex-col flex-1">
+                                {/* Header row */}
+                                <div className="flex items-center mb-2">
+                                    <span className="w-20 shrink-0" />
+                                    {weeks.map((_, idx) => (
+                                        <span
+                                            key={idx}
+                                            className={`flex-1 text-center text-[9px] font-bold tracking-wide ${idx === lastWeekIdx ? 'text-indigo-500 dark:text-indigo-400' : 'text-slate-300 dark:text-slate-600'}`}
+                                        >
+                                            {WEEK_LABELS[idx] ?? `W${idx + 1}`}
+                                        </span>
+                                    ))}
+                                </div>
+
+                                {/* Member rows – fill remaining space evenly */}
+                                <div className="flex flex-col flex-1 justify-between gap-2">
+                                    {statusByMember.map((member: any, mi: number) => (
+                                        <div key={mi} className="flex items-center gap-1">
+                                            <span
+                                                className="w-20 shrink-0 text-[11px] text-slate-600 dark:text-slate-300 font-medium truncate pr-2"
+                                                title={member.name}
+                                            >
+                                                {member.name.split(' ')[0]}
+                                            </span>
+                                            <div className="flex flex-1 gap-1">
+                                                {(member.statuses ?? []).map((s: any, si: number) => {
+                                                    const color = STATUS_COLORS[s.status] || STATUS_COLORS.NOT_STARTED;
+                                                    const isThisWeek = si === lastWeekIdx;
+                                                    return (
+                                                        <div
+                                                            key={si}
+                                                            title={`${member.name} – ${STATUS_LABEL[s.status] || s.status}`}
+                                                            className={`flex-1 h-7 rounded cursor-default transition-opacity hover:opacity-75 ${isThisWeek ? 'ring-2 ring-offset-1 ring-indigo-400 dark:ring-indigo-500' : ''}`}
+                                                            style={{ backgroundColor: color }}
+                                                        />
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        );
+                    })()}
+                    {/* Legend */}
+                    <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-3 pt-2 border-t border-slate-100 dark:border-slate-700/50">
                         {Object.entries(STATUS_COLORS).map(([s, c]) => (
-                            <LegendDot key={s} color={c} label={s.replace('_', ' ')} />
+                            <LegendDot key={s} color={c} label={s.replace(/_/g, ' ')} />
                         ))}
                     </div>
                 </div>
@@ -316,7 +350,7 @@ export default function DashboardInsights({ weekStartDate }: { weekStartDate?: s
                                 <Tooltip
                                     formatter={(val: any) => [`${val}h`, 'Hours']}
                                     contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #e2e8f0' }}
-                                    cursor={{fill: 'rgba(99, 102, 241, 0.05)'}}
+                                    cursor={{ fill: 'rgba(99, 102, 241, 0.05)' }}
                                 />
                                 <Bar dataKey="hours" fill="#10B981" radius={[4, 4, 0, 0]} barSize={24}>
                                     {timeByTaskType.map((_, i) => (
