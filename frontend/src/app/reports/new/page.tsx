@@ -20,7 +20,7 @@ export default function NewReportPage() {
 
     async function handleSave(data: ReportFormData) {
         const report = await reportsApi.create(data);
-        router.push(`/reports/${report.id}`);
+        router.replace(`/reports/${report.id}`);
     }
 
     return (

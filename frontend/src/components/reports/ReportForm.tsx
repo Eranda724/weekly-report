@@ -27,7 +27,7 @@ function SectionCard({ title, children }: { title: string; children: React.React
 }
 
 // Updated input fields to support both light and dark modes
-const inputCls = 'w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-[#0f172a] text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 text-sm px-4 py-2.5 outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all duration-200';
+const inputCls = 'w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-[#0f172a] text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 text-sm px-4 py-2.5 outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all duration-200 dark:[color-scheme:dark]';
 const labelCls = 'block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2';
 
 export default function ReportForm({ initialData, onSave, saveLabel }: Props) {

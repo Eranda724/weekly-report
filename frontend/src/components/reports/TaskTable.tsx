@@ -18,9 +18,9 @@ const emptyTask: ReportTask = {
 };
 
 const PRIORITY_CLS: Record<Priority, string> = {
-    HIGH:   'bg-red-100   text-red-700   dark:bg-red-900/40   dark:text-red-300',
-    MEDIUM: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
-    LOW:    'bg-sky-100   text-sky-700   dark:bg-sky-900/40   dark:text-sky-300',
+    HIGH:   'bg-red-50 text-red-700 border border-red-200 dark:bg-red-950/70 dark:text-red-300 dark:border-red-700/60',
+    MEDIUM: 'bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/70 dark:text-amber-300 dark:border-amber-700/60',
+    LOW:    'bg-sky-50 text-sky-700 border border-sky-200 dark:bg-sky-950/70 dark:text-sky-300 dark:border-sky-700/60',
 };
 
 const STATUS_OPTIONS = [
@@ -58,7 +58,7 @@ export default function TaskTable({ tasks, onChange }: Props) {
                         {/* Top Row: Task Name & Status & Remove */}
                         <div className="flex gap-3 items-start">
                             <div className="flex-1">
-                                <label className="block text-[0.65rem] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">
+                                <label className="block text-[0.65rem] font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider mb-1">
                                     Task Name
                                 </label>
                                 <input
@@ -71,7 +71,7 @@ export default function TaskTable({ tasks, onChange }: Props) {
                                 />
                             </div>
                             <div className="w-32 shrink-0">
-                                <label className="block text-[0.65rem] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">
+                                <label className="block text-[0.65rem] font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider mb-1">
                                     Status
                                 </label>
                                 <select
@@ -94,27 +94,27 @@ export default function TaskTable({ tasks, onChange }: Props) {
                         </div>
 
                         {/* Middle Row: Priority & Metrics */}
-                        <div className="flex items-end gap-5 bg-white dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 rounded-lg p-3">
+                        <div className="flex items-end gap-5 bg-white dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 rounded-lg p-3">
                             {/* 1. Priority (Fixed width) */}
                             <div className="w-24 shrink-0">
-                                <label className="block text-[0.65rem] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">
+                                <label className="block text-[0.65rem] font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider mb-1">
                                     Priority
                                 </label>
                                 <select
-                                    value={task.priority}
+                                    value={task.priority || 'MEDIUM'}
                                     onChange={(e) => updateRow(i, 'priority', e.target.value as Priority)}
-                                    className={`rounded-md border-none text-xs font-semibold px-2 py-1.5 outline-none cursor-pointer w-full ${PRIORITY_CLS[task.priority]}`}
+                                    className={`rounded-md text-xs font-semibold px-2 py-1.5 outline-none cursor-pointer w-full dark:[color-scheme:dark] transition-colors ${PRIORITY_CLS[task.priority || 'MEDIUM']}`}
                                 >
-                                    <option value="HIGH">High</option>
-                                    <option value="MEDIUM">Medium</option>
-                                    <option value="LOW">Low</option>
+                                    <option value="HIGH" className="bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100">High</option>
+                                    <option value="MEDIUM" className="bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100">Medium</option>
+                                    <option value="LOW" className="bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100">Low</option>
                                 </select>
                             </div>
 
                             {/* 2. Progress (50% of remaining width) */}
                             <div className="flex-1 flex gap-3 border-l border-slate-200 dark:border-slate-700/50 pl-5">
                                 <div className="flex-1">
-                                    <label className="block text-[0.65rem] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1 text-center whitespace-nowrap">
+                                    <label className="block text-[0.65rem] font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider mb-1 text-center whitespace-nowrap">
                                         Planned Progress
                                     </label>
                                     <div className="relative">
@@ -128,7 +128,7 @@ export default function TaskTable({ tasks, onChange }: Props) {
                                     </div>
                                 </div>
                                 <div className="flex-1">
-                                    <label className="block text-[0.65rem] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1 text-center whitespace-nowrap">
+                                    <label className="block text-[0.65rem] font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider mb-1 text-center whitespace-nowrap">
                                         Actual Progress
                                     </label>
                                     <div className="relative">
@@ -146,7 +146,7 @@ export default function TaskTable({ tasks, onChange }: Props) {
                             {/* 3. Hours (50% of remaining width) */}
                             <div className="flex-1 flex gap-3 border-l border-slate-200 dark:border-slate-700/50 pl-5">
                                 <div className="flex-1">
-                                    <label className="block text-[0.65rem] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1 text-center whitespace-nowrap">
+                                    <label className="block text-[0.65rem] font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider mb-1 text-center whitespace-nowrap">
                                         Planned Hours
                                     </label>
                                     <input
@@ -157,7 +157,7 @@ export default function TaskTable({ tasks, onChange }: Props) {
                                     />
                                 </div>
                                 <div className="flex-1">
-                                    <label className="block text-[0.65rem] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1 text-center whitespace-nowrap">
+                                    <label className="block text-[0.65rem] font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider mb-1 text-center whitespace-nowrap">
                                         Spent Hours
                                     </label>
                                     <input
@@ -172,7 +172,7 @@ export default function TaskTable({ tasks, onChange }: Props) {
 
                         {/* Bottom Row: Deliverable */}
                         <div>
-                            <label className="block text-[0.65rem] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">
+                            <label className="block text-[0.65rem] font-semibold text-slate-500 dark:text-slate-300 uppercase tracking-wider mb-1">
                                 Deliverable / Link
                             </label>
                             <input
