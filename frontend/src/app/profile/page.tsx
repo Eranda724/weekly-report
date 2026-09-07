@@ -55,17 +55,18 @@ export default function ProfilePage() {
 
     return (
         <ProtectedRoute>
-            <div className="min-h-screen bg-slate-50 dark:bg-slate-900 transition-colors duration-200 flex">
+            <div className="flex h-screen bg-slate-50 dark:bg-slate-950 overflow-hidden">
                 {user?.role === 'MANAGER' || user?.role === 'ADMIN' ? <ManagerSidebar /> : <Sidebar />}
 
-                <div className="ml-60 flex-1">
-                <div className="sticky top-0 z-10 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 shadow-sm px-6 h-16 flex items-center justify-between gap-4">
+                {/* Main Content */}
+                <div className="flex-1 ml-60 flex flex-col overflow-hidden">
+                    <div className="sticky top-0 z-10 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 shadow-sm px-6 h-16 flex items-center justify-between gap-4 shrink-0">
                         <h1 className="font-bold text-slate-800 dark:text-slate-100 text-sm tracking-wide uppercase whitespace-nowrap">
                             My Profile
                         </h1>
                     </div>
 
-                    <main className="px-8 pt-8 pb-12 space-y-6">
+                    <main className="flex-1 overflow-y-auto px-8 pt-8 pb-12 space-y-6 bg-slate-50 dark:bg-slate-950">
 
                         {/* ── Profile card ── */}
                         <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 shadow-sm flex items-center gap-6">

@@ -97,7 +97,7 @@ model Report {
   versions        ReportVersion[]
   reviewComments  ReviewComment[]
 
-  @@unique([userId, weekStartDate])
+  @@unique([userId, projectId, weekStartDate])
   @@map("reports")
 }
 

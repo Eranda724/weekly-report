@@ -280,18 +280,18 @@ export default function UserManagementContent() {
 
                                 {/* TEAMS TAB */}
                                 {activeTab === 'teams' && (
-                                    <div className="space-y-4">
-                                        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
-                                            <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50">
-                                                <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Teams</h2>
-                                                <button onClick={() => setShowTeamModal(true)} className="bg-indigo-600 text-white text-sm font-medium px-4 py-2 rounded-lg shadow-sm hover:bg-indigo-700 transition-all flex items-center gap-2 border-none cursor-pointer">
-                                                    Create Team
-                                                </button>
-                                            </div>
+                                    <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+                                        <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50">
+                                            <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Teams</h2>
+                                            <button onClick={() => setShowTeamModal(true)} className="bg-indigo-600 text-white text-sm font-medium px-4 py-2 rounded-lg shadow-sm hover:bg-indigo-700 transition-all flex items-center gap-2 border-none cursor-pointer">
+                                                Create Team
+                                            </button>
                                         </div>
 
-                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                            {projects.map(project => (
+                                        {projects.length > 0 ? (
+                                            <div className="p-6">
+                                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                                    {projects.map(project => (
                                                 <div key={project.id} className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 hover:shadow-md transition-shadow">
                                                     <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-start bg-gradient-to-r from-slate-50/50 to-white dark:from-slate-800/50 dark:to-slate-900">
                                                         <div>
@@ -409,10 +409,11 @@ export default function UserManagementContent() {
                                                         })()}
                                                     </div>
                                                 </div>
-                                            ))}
-                                        </div>
-                                        {projects.length === 0 && (
-                                            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-12 text-center shadow-sm">
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="p-12 text-center">
                                                 <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100 dark:border-slate-700">
                                                     <svg className="w-8 h-8 text-slate-400 dark:text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
                                                 </div>

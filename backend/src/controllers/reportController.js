@@ -14,7 +14,7 @@ async function create(req, res) {
         res.status(201).json(report);
     } catch (err) {
         if (err.code === 'P2002') {
-            return res.status(400).json({ error: 'A report for this week already exists.' });
+            return res.status(400).json({ error: 'A report for this project and week already exists.' });
         }
         res.status(400).json({ error: err.message });
     }
