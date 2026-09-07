@@ -153,7 +153,7 @@ export default function ReportForm({ initialData, onSave, saveLabel }: Props) {
                                 Tasks Planned for Next Week
                             </label>
                             <textarea
-                                value={form.tasksNextWeek}
+                                value={form.tasksNextWeek || ''}
                                 onChange={(e) => updateField('tasksNextWeek', e.target.value)}
                                 className={inputCls}
                                 rows={3}
@@ -165,7 +165,7 @@ export default function ReportForm({ initialData, onSave, saveLabel }: Props) {
                                 Notes / Links <span className="normal-case font-normal text-slate-500">(optional)</span>
                             </label>
                             <textarea
-                                value={form.notesLinks}
+                                value={form.notesLinks || ''}
                                 onChange={(e) => updateField('notesLinks', e.target.value)}
                                 className={inputCls}
                                 rows={2}

@@ -18,7 +18,7 @@ export default function EditReportPage() {
 
     async function handleSave(data: ReportFormData) {
         await reportsApi.update(id, data);
-        router.push(`/reports/${id}`);
+        router.replace(`/reports/${id}`);
     }
 
     if (error) return <p className="p-8 text-red-600">{error}</p>;
@@ -27,7 +27,31 @@ export default function EditReportPage() {
     if (!['DRAFT', 'NEEDS_CORRECTION'].includes(report.status)) {
         return (
             <ProtectedRoute allowedRoles={['TEAM_MEMBER']}>
-                <p className="p-8 text-gray-600">This report cannot be edited in its current status ({report.status}).</p>
+                <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center p-6">
+                    <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-8 max-w-md w-full text-center shadow-lg">
+                        <div className="w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto mb-4 text-xl">
+                            ℹ️
+                        </div>
+                        <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2">Report Cannot Be Edited</h2>
+                        <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
+                            This report cannot be edited in its current status (<span className="font-semibold text-slate-700 dark:text-slate-200">{report.status}</span>).
+                        </p>
+                        <div className="flex gap-3 justify-center">
+                            <button
+                                onClick={() => router.push('/reports')}
+                                className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-lg transition-colors cursor-pointer border-none"
+                            >
+                                All Reports
+                            </button>
+                            <button
+                                onClick={() => router.push(`/reports/${id}`)}
+                                className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-500 rounded-lg transition-colors cursor-pointer border-none"
+                            >
+                                View Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </ProtectedRoute>
         );
     }
@@ -35,8 +59,8 @@ export default function EditReportPage() {
     const initialData: ReportFormData = {
         projectId: report.projectId,
         weekStartDate: report.weekStartDate.split('T')[0],
-        tasksNextWeek: report.tasksNextWeek,
-        notesLinks: report.notesLinks,
+        tasksNextWeek: report.tasksNextWeek || '',
+        notesLinks: report.notesLinks || '',
         tasks: report.tasks,
         highlights: report.highlights,
         hoursBreakdown: report.hoursBreakdown,

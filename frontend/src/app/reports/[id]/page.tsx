@@ -76,6 +76,7 @@ export default function ReportDetailPage() {
         ? report?.highlights?.filter((h) => h.itemType === 'ACHIEVEMENT') || []
         : activeSnapshot?.highlights?.filter((h: any) => h.itemType === 'ACHIEVEMENT') || [];
     const displayNextWeek = isLatest ? report?.tasksNextWeek : activeSnapshot?.tasksNextWeek;
+    const displayNotesLinks = isLatest ? report?.notesLinks : activeSnapshot?.notesLinks;
 
     if (!report) {
         return (
@@ -112,8 +113,12 @@ export default function ReportDetailPage() {
         <div className="sticky top-0 z-20 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 px-6 h-16 flex items-center justify-between">
             <div className="flex items-center gap-3">
                 <button
-                    onClick={() => router.back()}
-                    className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 transition-colors"
+                    onClick={() => {
+                        const target = user?.role === 'MANAGER' || user?.role === 'ADMIN' ? '/dashboard/reports' : '/reports';
+                        router.push(target);
+                    }}
+                    className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 transition-colors cursor-pointer"
+                    title="Back to reports"
                 >
                     ←
                 </button>
@@ -333,18 +338,34 @@ export default function ReportDetailPage() {
                             </div>
                         </div>
 
-                        {/* Next Week (Full Width) */}
-                        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl overflow-hidden shadow-sm flex flex-col">
-                            <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 flex items-center gap-2">
-
-                                <h3 className="font-semibold text-slate-800 dark:text-slate-100">Plans for Next Week</h3>
+                        {/* Plans & Notes (Side-by-side or stacked grid) */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* Next Week */}
+                            <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl overflow-hidden shadow-sm flex flex-col">
+                                <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 flex items-center gap-2">
+                                    <h3 className="font-semibold text-slate-800 dark:text-slate-100">Tasks Planned for Next Week</h3>
+                                </div>
+                                <div className="p-6 flex-1">
+                                    {displayNextWeek ? (
+                                        <p className="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-wrap">{displayNextWeek}</p>
+                                    ) : (
+                                        <p className="text-slate-400 dark:text-slate-500 text-sm italic">No plans provided.</p>
+                                    )}
+                                </div>
                             </div>
-                            <div className="p-6 flex-1">
-                                {displayNextWeek ? (
-                                    <p className="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-wrap">{displayNextWeek}</p>
-                                ) : (
-                                    <p className="text-slate-400 dark:text-slate-500 text-sm italic">No plans provided.</p>
-                                )}
+
+                            {/* Notes / Links */}
+                            <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl overflow-hidden shadow-sm flex flex-col">
+                                <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 flex items-center gap-2">
+                                    <h3 className="font-semibold text-slate-800 dark:text-slate-100">Notes / Links</h3>
+                                </div>
+                                <div className="p-6 flex-1">
+                                    {displayNotesLinks ? (
+                                        <p className="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-wrap">{displayNotesLinks}</p>
+                                    ) : (
+                                        <p className="text-slate-400 dark:text-slate-500 text-sm italic">No notes or links provided.</p>
+                                    )}
+                                </div>
                             </div>
                         </div>
 
