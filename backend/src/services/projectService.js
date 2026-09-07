@@ -41,8 +41,12 @@ async function updateProject(id, { name }) {
 }
 
 async function deleteProject(id) {
-    // Remove all project members first, then hard-delete the project
+    // Detach historical reports first so the project row can be permanently deleted.
     await prisma.projectMember.deleteMany({ where: { projectId: id } });
+    await prisma.report.updateMany({
+        where: { projectId: id },
+        data: { projectId: null },
+    });
     return prisma.project.delete({ where: { id } });
 }
 

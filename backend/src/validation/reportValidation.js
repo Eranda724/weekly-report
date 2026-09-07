@@ -15,7 +15,12 @@ function requireText(value, field) {
 function validateReportData(data) {
     if (!data || typeof data !== 'object') throw new Error('Report data is required');
 
-    requireText(data.projectId, 'projectId');
+    if (!data.projectId && !data.categoryId) {
+        throw new Error('A project or category tag is required');
+    }
+    if (data.projectId !== undefined && data.projectId !== null && typeof data.projectId !== 'string') {
+        throw new Error('projectId must be a string');
+    }
     requireText(data.weekStartDate, 'weekStartDate');
     if (Number.isNaN(new Date(data.weekStartDate).getTime())) throw new Error('weekStartDate must be a valid date');
 

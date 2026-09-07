@@ -60,8 +60,8 @@ export default function ReportForm({ initialData, onSave, saveLabel }: Props) {
 
     async function save() {
         setError('');
-        if (!form.projectId || !form.categoryId || !form.weekStartDate) {
-            setError('Project, category, and week are required.');
+        if ((!form.projectId && !form.categoryId) || !form.weekStartDate) {
+            setError('Week and a project or category tag are required.');
             return;
         }
         setSaving(true);
@@ -83,9 +83,9 @@ export default function ReportForm({ initialData, onSave, saveLabel }: Props) {
                 </div>
             )}
 
-            {/* Section 1 — Week & Project */}
+            {/* Section 1 — Week & Project / Category tag */}
             <SectionCard title="">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label className={labelCls}>
                             Week Starting
@@ -100,38 +100,31 @@ export default function ReportForm({ initialData, onSave, saveLabel }: Props) {
                     </div>
                     <div>
                         <label className={labelCls}>
-                            Project
+                            Project / Category
                         </label>
                         <select
-                            value={form.projectId}
-                            onChange={(e) => updateField('projectId', e.target.value)}
-                            className={inputCls}
-                            required
-                        >
-                            <option value="" className="text-slate-500">Select a project…</option>
-                            {projects.map((p) => (
-                                <option key={p.id} value={p.id}>{p.name}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <div>
-                        <label className={labelCls}>
-                            Category
-                        </label>
-                        <select
-                            value={form.categoryId || ''}
+                            value={form.projectId ? `project:${form.projectId}` : form.categoryId ? `category:${form.categoryId}` : ''}
                             onChange={(e) => {
-                                const selected = categories.find((category) => category.id === e.target.value);
-                                updateField('categoryId', e.target.value);
-                                updateField('category', selected?.name || '');
+                                const [type, id] = e.target.value.split(':');
+                                const selectedCategory = categories.find((category) => category.id === id);
+                                updateField('projectId', type === 'project' ? id : '');
+                                updateField('categoryId', type === 'category' ? id : '');
+                                updateField('category', selectedCategory?.name || '');
                             }}
                             className={inputCls}
                             required
                         >
-                            <option value="">Select a category...</option>
-                            {categories.map((category) => (
-                                <option key={category.id} value={category.id}>{category.name}</option>
+                            <option value="" className="text-slate-500">Select a project or category...</option>
+                            <optgroup label="Projects">
+                            {projects.map((p) => (
+                                <option key={`project:${p.id}`} value={`project:${p.id}`}>{p.name}</option>
                             ))}
+                            </optgroup>
+                            <optgroup label="Categories">
+                            {categories.map((category) => (
+                                <option key={`category:${category.id}`} value={`category:${category.id}`}>{category.name}</option>
+                            ))}
+                            </optgroup>
                         </select>
                     </div>
                 </div>
@@ -162,8 +155,8 @@ export default function ReportForm({ initialData, onSave, saveLabel }: Props) {
 
             {/* Row: Hours and Plans side by side */}
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
-                {/* Section 4 — Hours Breakdown */}
-                <SectionCard title="Hours Worked by Task Type">
+                {/* Section 4 — Optional hours breakdown */}
+                <SectionCard title="Hours Worked by Task Type (Optional)">
                     <HoursBreakdownSection
                         entries={form.hoursBreakdown}
                         onChange={(hoursBreakdown) => updateField('hoursBreakdown', hoursBreakdown)}

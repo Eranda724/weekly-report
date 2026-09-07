@@ -13,7 +13,8 @@ const STATUS_CONFIG: Record<string, { label: string; cls: string }> = {
     APPROVED:         { label: 'Approved',           cls: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300' },
 };
 
-const selectCls = 'text-sm border border-slate-200 dark:border-slate-600 rounded-lg px-3 py-1.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-400 cursor-pointer';
+const filterControlCls = 'w-full h-10 text-sm border border-slate-200 dark:border-slate-600 rounded-lg px-3 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 cursor-pointer';
+const filterLabelCls = 'block mb-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500';
 
 export default function TeamReportsPage() {
     const [reports, setReports]   = useState<Report[]>([]);
@@ -23,7 +24,7 @@ export default function TeamReportsPage() {
     const [error, setError]       = useState('');
 
     const [filters, setFilters] = useState({
-        userId: '', projectId: '', status: '', weekStartDate: '', fromDate: '', toDate: '',
+        userId: '', projectId: '', status: '', fromDate: '', toDate: '',
     });
 
     async function loadReports() {
@@ -33,7 +34,6 @@ export default function TeamReportsPage() {
                 userId:        filters.userId || undefined,
                 projectId:     filters.projectId || undefined,
                 status:        filters.status || undefined,
-                weekStartDate: filters.weekStartDate || undefined,
                 fromDate:      filters.fromDate || undefined,
                 toDate:        filters.toDate || undefined,
                 pageSize: 100,
@@ -69,73 +69,58 @@ export default function TeamReportsPage() {
 
     return (
         <ProtectedRoute allowedRoles={['MANAGER', 'ADMIN']}>
-            {/* ── Top filter bar ── */}
-            <div className="sticky top-0 z-10 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 shadow-sm px-6 h-16 flex items-center justify-between gap-4">
-                <h1 className="font-bold text-slate-800 dark:text-slate-100 text-sm tracking-wide uppercase whitespace-nowrap">
-                    Team Reports
-                </h1>
-                <div className="flex items-center gap-2 flex-wrap">
-                    {/* Week */}
-                    <div className="flex items-center gap-1.5">
-                        <span className="text-xs text-slate-400 dark:text-slate-500 font-medium">Week:</span>
-                        <input
-                            type="date"
-                            value={filters.weekStartDate}
-                            onChange={(e) => updateFilter('weekStartDate', e.target.value)}
-                            className={selectCls}
-                        />
+            {/* ── Header and filter bar ── */}
+            <div className="sticky top-0 z-10 border-b border-slate-200 bg-white/95 px-6 py-4 shadow-sm backdrop-blur dark:border-slate-700 dark:bg-slate-800/95">
+                <div className="flex items-center justify-between gap-4">
+                    <div>
+                        <h1 className="text-sm font-bold uppercase tracking-wide text-slate-800 dark:text-slate-100">Team Reports</h1>
+                        <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">Review and manage reports from your team</p>
                     </div>
-                    {/* Date range */}
-                    <div className="flex items-center gap-1.5">
-                        <span className="text-xs text-slate-400 dark:text-slate-500 font-medium">From:</span>
-                        <input
-                            type="date"
-                            value={filters.fromDate}
-                            onChange={(e) => updateFilter('fromDate', e.target.value)}
-                            className={selectCls}
-                        />
-                        <span className="text-xs text-slate-400 dark:text-slate-500 font-medium">To:</span>
-                        <input
-                            type="date"
-                            value={filters.toDate}
-                            min={filters.fromDate || undefined}
-                            onChange={(e) => updateFilter('toDate', e.target.value)}
-                            className={selectCls}
-                        />
+                    <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-500 dark:bg-slate-700 dark:text-slate-300">
+                        {reports.length} result{reports.length !== 1 ? 's' : ''}
+                    </span>
+                </div>
+
+                <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-7">
+                    <div>
+                        <label htmlFor="from-filter" className={filterLabelCls}>From Date</label>
+                        <input id="from-filter" type="date" value={filters.fromDate} onChange={(e) => updateFilter('fromDate', e.target.value)} className={filterControlCls} />
                     </div>
-                    {/* Team Member */}
-                    <div className="flex items-center gap-1.5">
-                        <span className="text-xs text-slate-400 dark:text-slate-500 font-medium">Member:</span>
-                        <select value={filters.userId} onChange={(e) => updateFilter('userId', e.target.value)} className={selectCls}>
-                            <option value="">All Members</option>
+                    <div>
+                        <label htmlFor="to-filter" className={filterLabelCls}>To Date</label>
+                        <input id="to-filter" type="date" value={filters.toDate} min={filters.fromDate || undefined} onChange={(e) => updateFilter('toDate', e.target.value)} className={filterControlCls} />
+                    </div>
+                    <div>
+                        <label htmlFor="member-filter" className={filterLabelCls}>Team member</label>
+                        <select id="member-filter" value={filters.userId} onChange={(e) => updateFilter('userId', e.target.value)} className={filterControlCls}>
+                            <option value="">All members</option>
                             {members.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
                         </select>
                     </div>
-                    {/* Project */}
-                    <div className="flex items-center gap-1.5">
-                        <span className="text-xs text-slate-400 dark:text-slate-500 font-medium">Project:</span>
-                        <select value={filters.projectId} onChange={(e) => updateFilter('projectId', e.target.value)} className={selectCls}>
-                            <option value="">All Projects</option>
+                    <div>
+                        <label htmlFor="project-filter" className={filterLabelCls}>Project</label>
+                        <select id="project-filter" value={filters.projectId} onChange={(e) => updateFilter('projectId', e.target.value)} className={filterControlCls}>
+                            <option value="">All projects</option>
                             {projects.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
                         </select>
                     </div>
-                    {/* Status */}
-                    <select value={filters.status} onChange={(e) => updateFilter('status', e.target.value)} className={selectCls}>
-                        <option value="">All Statuses</option>
-                        <option value="DRAFT">Draft</option>
-                        <option value="SUBMITTED">Submitted</option>
-                        <option value="NEEDS_CORRECTION">Needs Correction</option>
-                        <option value="APPROVED">Approved</option>
-                    </select>
-                    {/* Clear */}
-                    {(filters.userId || filters.projectId || filters.status || filters.weekStartDate || filters.fromDate || filters.toDate) && (
-                        <button
-                            onClick={() => setFilters({ userId: '', projectId: '', status: '', weekStartDate: '', fromDate: '', toDate: '' })}
-                            className="text-xs text-slate-400 hover:text-red-500 dark:hover:text-red-400 underline bg-transparent border-none cursor-pointer transition-colors"
-                        >
-                            Clear
-                        </button>
-                    )}
+                    <div>
+                        <label htmlFor="status-filter" className={filterLabelCls}>Status</label>
+                        <select id="status-filter" value={filters.status} onChange={(e) => updateFilter('status', e.target.value)} className={filterControlCls}>
+                            <option value="">All statuses</option>
+                            <option value="DRAFT">Draft</option>
+                            <option value="SUBMITTED">Submitted</option>
+                            <option value="NEEDS_CORRECTION">Needs correction</option>
+                            <option value="APPROVED">Approved</option>
+                        </select>
+                    </div>
+                    <div className="flex items-end">
+                        {(filters.userId || filters.projectId || filters.status || filters.fromDate || filters.toDate) && (
+                            <button onClick={() => setFilters({ userId: '', projectId: '', status: '', fromDate: '', toDate: '' })} className="h5 w-30 rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-500 transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-600 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-red-800 dark:hover:bg-red-900/20 dark:hover:text-red-300">
+                                Clear filters
+                            </button>
+                        )}
+                    </div>
                 </div>
             </div>
 
@@ -150,8 +135,7 @@ export default function TeamReportsPage() {
                 {/* ── Reports table ── */}
                 <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm overflow-hidden">
                     <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
-                        <h2 className="font-semibold text-slate-700 dark:text-slate-200 text-sm">Submitted Reports</h2>
-                        <span className="text-xs text-slate-400 dark:text-slate-500">{reports.length} result{reports.length !== 1 ? 's' : ''}</span>
+                        <h2 className="font-semibold text-slate-700 dark:text-slate-200 text-sm">Team report queue</h2>
                     </div>
 
                     {loading && (
@@ -223,7 +207,7 @@ export default function TeamReportsPage() {
                 </div>
             </div>
             
-            <AIChatWidget weekStartDate={filters.weekStartDate || undefined} />
+            <AIChatWidget weekStartDate={filters.fromDate || undefined} />
         </ProtectedRoute>
     );
 }

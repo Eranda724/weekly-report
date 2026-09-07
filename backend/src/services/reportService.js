@@ -19,7 +19,7 @@ async function createDraftReport(userId, data) {
         const report = await tx.report.create({
             data: {
                 userId,
-                projectId,
+                projectId: projectId || null,
                 category,
                 ...(categoryId ? { categoryId } : {}),
                 weekStartDate: new Date(weekStartDate),
@@ -88,7 +88,7 @@ async function getReportById(reportId, requestingUser) {
     }
     
     // Clean up projectMembers from response so it doesn't leak unnecessarily
-    delete report.project.projectMembers;
+    if (report.project) delete report.project.projectMembers;
 
     return report;
 }
@@ -129,7 +129,7 @@ async function updateReport(reportId, userId, data) {
         const updated = await tx.report.update({
             where: { id: reportId },
             data: {
-                projectId,
+                projectId: projectId || null,
                 ...(category !== undefined ? { category } : {}),
                 ...(categoryId !== undefined ? { categoryId: categoryId || null } : {}),
                 weekStartDate: new Date(weekStartDate),
@@ -257,7 +257,9 @@ async function listAllReports(requestingUser, filters = {}) {
     const endDate = toDate ? new Date(`${toDate}T00:00:00.000Z`) : null;
     if (endDate) endDate.setUTCDate(endDate.getUTCDate() + 1);
 
-    const dateFilter = fromDate || endDate
+    const dateFilter = fromDate && !toDate
+        ? { equals: new Date(`${fromDate}T00:00:00.000Z`) }
+        : fromDate || endDate
         ? {
             ...(fromDate ? { gte: new Date(`${fromDate}T00:00:00.000Z`) } : {}),
             ...(endDate ? { lt: endDate } : {}),
