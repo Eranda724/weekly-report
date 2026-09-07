@@ -89,6 +89,8 @@ export const managerReportsApi = {
     projectId?: string;
     status?: string;
     weekStartDate?: string;
+    fromDate?: string;
+    toDate?: string;
     page?: number;
     pageSize?: number;
   }) => {
@@ -97,6 +99,8 @@ export const managerReportsApi = {
     if (params?.projectId) query.set('projectId', params.projectId);
     if (params?.status) query.set('status', params.status);
     if (params?.weekStartDate) query.set('weekStartDate', params.weekStartDate);
+    if (params?.fromDate) query.set('fromDate', params.fromDate);
+    if (params?.toDate) query.set('toDate', params.toDate);
     if (params?.page) query.set('page', String(params.page));
     if (params?.pageSize) query.set('pageSize', String(params.pageSize));
     const qs = query.toString();

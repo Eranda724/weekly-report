@@ -80,9 +80,9 @@ async function review(req, res) {
 
 async function listAll(req, res) {
     try {
-        const { userId, projectId, status, weekStartDate, page, pageSize } = req.query;
+        const { userId, projectId, status, weekStartDate, fromDate, toDate, page, pageSize } = req.query;
         const result = await listAllReports(req.user, {
-            userId, projectId, status, weekStartDate,
+            userId, projectId, status, weekStartDate, fromDate, toDate,
             page: page ? Number(page) : undefined,
             pageSize: pageSize ? Number(pageSize) : undefined,
         });

@@ -240,13 +240,27 @@ async function listAllReports(requestingUser, filters = {}) {
         throw new Error('Forbidden');
     }
 
-    const { userId, projectId, status, weekStartDate, page = 1, pageSize = 10 } = filters;
+    const { userId, projectId, status, weekStartDate, fromDate, toDate, page = 1, pageSize = 10 } = filters;
+
+    if (fromDate && toDate && new Date(fromDate) > new Date(toDate)) {
+        throw new Error('fromDate must be before or equal to toDate');
+    }
+
+    const endDate = toDate ? new Date(`${toDate}T00:00:00.000Z`) : null;
+    if (endDate) endDate.setUTCDate(endDate.getUTCDate() + 1);
+
+    const dateFilter = fromDate || endDate
+        ? {
+            ...(fromDate ? { gte: new Date(`${fromDate}T00:00:00.000Z`) } : {}),
+            ...(endDate ? { lt: endDate } : {}),
+        }
+        : undefined;
 
     const where = {
         ...(userId ? { userId } : {}),
         ...(projectId ? { projectId } : {}),
         ...(status ? { status } : {}),
-        ...(weekStartDate ? { weekStartDate: new Date(weekStartDate) } : {}),
+        ...(dateFilter ? { weekStartDate: dateFilter } : weekStartDate ? { weekStartDate: new Date(weekStartDate) } : {}),
     };
 
     // Managers and Admins can see all reports matching the basic filters.

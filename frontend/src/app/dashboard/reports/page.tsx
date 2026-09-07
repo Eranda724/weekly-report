@@ -23,7 +23,7 @@ export default function TeamReportsPage() {
     const [error, setError]       = useState('');
 
     const [filters, setFilters] = useState({
-        userId: '', projectId: '', status: '', weekStartDate: '',
+        userId: '', projectId: '', status: '', weekStartDate: '', fromDate: '', toDate: '',
     });
 
     async function loadReports() {
@@ -34,6 +34,8 @@ export default function TeamReportsPage() {
                 projectId:     filters.projectId || undefined,
                 status:        filters.status || undefined,
                 weekStartDate: filters.weekStartDate || undefined,
+                fromDate:      filters.fromDate || undefined,
+                toDate:        filters.toDate || undefined,
                 pageSize: 100,
             });
             const sorted = res.reports.sort((a: Report, b: Report) => {
@@ -83,6 +85,24 @@ export default function TeamReportsPage() {
                             className={selectCls}
                         />
                     </div>
+                    {/* Date range */}
+                    <div className="flex items-center gap-1.5">
+                        <span className="text-xs text-slate-400 dark:text-slate-500 font-medium">From:</span>
+                        <input
+                            type="date"
+                            value={filters.fromDate}
+                            onChange={(e) => updateFilter('fromDate', e.target.value)}
+                            className={selectCls}
+                        />
+                        <span className="text-xs text-slate-400 dark:text-slate-500 font-medium">To:</span>
+                        <input
+                            type="date"
+                            value={filters.toDate}
+                            min={filters.fromDate || undefined}
+                            onChange={(e) => updateFilter('toDate', e.target.value)}
+                            className={selectCls}
+                        />
+                    </div>
                     {/* Team Member */}
                     <div className="flex items-center gap-1.5">
                         <span className="text-xs text-slate-400 dark:text-slate-500 font-medium">Member:</span>
@@ -108,9 +128,9 @@ export default function TeamReportsPage() {
                         <option value="APPROVED">Approved</option>
                     </select>
                     {/* Clear */}
-                    {(filters.userId || filters.projectId || filters.status || filters.weekStartDate) && (
+                    {(filters.userId || filters.projectId || filters.status || filters.weekStartDate || filters.fromDate || filters.toDate) && (
                         <button
-                            onClick={() => setFilters({ userId: '', projectId: '', status: '', weekStartDate: '' })}
+                            onClick={() => setFilters({ userId: '', projectId: '', status: '', weekStartDate: '', fromDate: '', toDate: '' })}
                             className="text-xs text-slate-400 hover:text-red-500 dark:hover:text-red-400 underline bg-transparent border-none cursor-pointer transition-colors"
                         >
                             Clear
