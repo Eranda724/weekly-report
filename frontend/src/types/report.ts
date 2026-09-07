@@ -29,6 +29,7 @@ export type HoursBreakdownEntry = {
 
 export type ReportFormData = {
     projectId: string;
+    category: string;
     weekStartDate: string; // yyyy-mm-dd
     tasksNextWeek: string;
     notesLinks: string;

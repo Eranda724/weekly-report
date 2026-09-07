@@ -58,6 +58,7 @@ export default function EditReportPage() {
 
     const initialData: ReportFormData = {
         projectId: report.projectId,
+        category: report.category || '',
         weekStartDate: report.weekStartDate.split('T')[0],
         tasksNextWeek: report.tasksNextWeek || '',
         notesLinks: report.notesLinks || '',

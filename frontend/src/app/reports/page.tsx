@@ -207,6 +207,9 @@ export default function ReportHistoryPage() {
                                                         {report.project.name}
                                                     </span>
                                                 )}
+                                                {report.category && (
+                                                    <span className="text-xs text-slate-400 dark:text-slate-500">{report.category}</span>
+                                                )}
                                                 {report.currentVersion > 1 && (
                                                     <span className="text-indigo-500 dark:text-indigo-400 text-xs font-bold">
                                                         v{report.currentVersion}

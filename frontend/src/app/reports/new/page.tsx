@@ -7,6 +7,7 @@ import { ReportFormData } from '@/types/report';
 
 const emptyForm: ReportFormData = {
     projectId: '',
+    category: '',
     weekStartDate: '',
     tasksNextWeek: '',
     notesLinks: '',

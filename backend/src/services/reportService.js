@@ -3,6 +3,7 @@ const prisma = require('../config/prisma');
 async function createDraftReport(userId, data) {
     const {
         projectId,
+        category,
         weekStartDate,
         tasksNextWeek,
         notesLinks,
@@ -16,6 +17,7 @@ async function createDraftReport(userId, data) {
             data: {
                 userId,
                 projectId,
+                category,
                 weekStartDate: new Date(weekStartDate),
                 status: 'DRAFT',
                 tasksNextWeek,
@@ -96,6 +98,7 @@ async function updateReport(reportId, userId, data) {
 
     const {
         projectId,
+        category,
         weekStartDate,
         tasksNextWeek,
         notesLinks,
@@ -120,6 +123,7 @@ async function updateReport(reportId, userId, data) {
             where: { id: reportId },
             data: {
                 projectId,
+                ...(category !== undefined ? { category } : {}),
                 weekStartDate: new Date(weekStartDate),
                 tasksNextWeek,
                 notesLinks,

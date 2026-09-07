@@ -55,8 +55,8 @@ export default function ReportForm({ initialData, onSave, saveLabel }: Props) {
 
     async function save() {
         setError('');
-        if (!form.projectId || !form.weekStartDate) {
-            setError('Project and week are required.');
+        if (!form.projectId || !form.category.trim() || !form.weekStartDate) {
+            setError('Project, category, and week are required.');
             return;
         }
         setSaving(true);
@@ -79,7 +79,7 @@ export default function ReportForm({ initialData, onSave, saveLabel }: Props) {
             )}
 
             {/* Section 1 — Week & Project */}
-            <SectionCard title="Week & Project">
+            <SectionCard title="Week, Project & Category">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label className={labelCls}>
@@ -95,7 +95,7 @@ export default function ReportForm({ initialData, onSave, saveLabel }: Props) {
                     </div>
                     <div>
                         <label className={labelCls}>
-                            Project / Category
+                            Project
                         </label>
                         <select
                             value={form.projectId}
@@ -108,6 +108,19 @@ export default function ReportForm({ initialData, onSave, saveLabel }: Props) {
                                 <option key={p.id} value={p.id}>{p.name}</option>
                             ))}
                         </select>
+                    </div>
+                    <div>
+                        <label className={labelCls}>
+                            Category
+                        </label>
+                        <input
+                            type="text"
+                            value={form.category}
+                            onChange={(e) => updateField('category', e.target.value)}
+                            className={inputCls}
+                            placeholder="e.g. Backend, Design, Planning"
+                            required
+                        />
                     </div>
                 </div>
             </SectionCard>

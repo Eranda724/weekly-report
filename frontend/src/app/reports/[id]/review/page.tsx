@@ -180,7 +180,7 @@ export default function ManagerReviewPage() {
                             <div className="flex-1 text-center sm:text-left">
                                 <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">{report.user?.name}</h2>
                                 <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">
-                                    {report.project?.name || 'No Project'} · Week of {new Date(report.weekStartDate).toLocaleDateString()}
+                                    {report.project?.name || 'No Project'} · {report.category || 'Uncategorized'} · Week of {new Date(report.weekStartDate).toLocaleDateString()}
                                 </p>
                             </div>
 

@@ -168,6 +168,9 @@ export default function TeamReportsPage() {
                                         {report.project?.name && (
                                             <p className="text-xs text-slate-400 dark:text-slate-500 truncate">{report.project.name}</p>
                                         )}
+                                        {report.category && (
+                                            <p className="text-xs text-slate-400 dark:text-slate-500 truncate">{report.category}</p>
+                                        )}
                                     </div>
                                 </div>
                                 <div className="flex items-center w-56 shrink-0">

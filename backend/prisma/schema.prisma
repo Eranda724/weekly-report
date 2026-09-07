@@ -93,6 +93,7 @@ model Report {
   id              String        @id @default(uuid())
   userId          String
   projectId       String
+  category        String        @default("")
   weekStartDate   DateTime
   status          ReportStatus  @default(DRAFT)
   tasksNextWeek   String?
