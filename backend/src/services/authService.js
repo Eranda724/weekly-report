@@ -1,6 +1,16 @@
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 const prisma = require('../config/prisma');
 const { generateToken } = require('../config/jwt');
+
+const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
+async function createSession(user) {
+    const sessionId = crypto.randomUUID();
+    const expiresAt = new Date(Date.now() + SESSION_TTL_MS);
+    await prisma.session.create({ data: { id: sessionId, userId: user.id, expiresAt } });
+    return { token: generateToken(user, sessionId), expiresAt };
+}
 
 async function registerUser({ name, email, password }) {
     const existing = await prisma.user.findUnique({ where: { email } });
@@ -19,8 +29,8 @@ async function registerUser({ name, email, password }) {
         },
     });
 
-    const token = generateToken(user);
-    return { token, user: sanitizeUser(user) };
+    const session = await createSession(user);
+    return { ...session, user: sanitizeUser(user) };
 }
 
 async function loginUser({ email, password }) {
@@ -34,8 +44,8 @@ async function loginUser({ email, password }) {
         throw new Error('Invalid credentials');
     }
 
-    const token = generateToken(user);
-    return { token, user: sanitizeUser(user) };
+    const session = await createSession(user);
+    return { ...session, user: sanitizeUser(user) };
 }
 
 function sanitizeUser(user) {
@@ -43,4 +53,12 @@ function sanitizeUser(user) {
     return safeUser;
 }
 
-module.exports = { registerUser, loginUser };
+async function revokeSession(sessionId) {
+    if (!sessionId) return;
+    await prisma.session.updateMany({
+        where: { id: sessionId, revokedAt: null },
+        data: { revokedAt: new Date() },
+    });
+}
+
+module.exports = { registerUser, loginUser, revokeSession };

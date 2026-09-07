@@ -10,6 +10,10 @@ const TEST_EMAILS = {
     admin: 'rbac-test-admin@test.com',
 };
 
+function sessionToken(response) {
+    return response.headers['set-cookie'][0].split(';')[0].split('=')[1];
+}
+
 let memberToken, otherMemberToken, managerToken, adminToken;
 let memberReportId;
 let testProjectId;
@@ -24,14 +28,14 @@ beforeAll(async () => {
         email: TEST_EMAILS.member,
         password: 'password123',
     });
-    memberToken = memberRes.body.token;
+    memberToken = sessionToken(memberRes);
 
     const otherMemberRes = await request(app).post('/api/auth/register').send({
         name: 'RBAC Test Other Member',
         email: TEST_EMAILS.otherMember,
         password: 'password123',
     });
-    otherMemberToken = otherMemberRes.body.token;
+    otherMemberToken = sessionToken(otherMemberRes);
 
     // Manager and Admin can't self-register with that role, so create directly
     const passwordHash = await bcrypt.hash('password123', 10);
@@ -45,12 +49,12 @@ beforeAll(async () => {
     const managerLogin = await request(app).post('/api/auth/login').send({
         email: TEST_EMAILS.manager, password: 'password123',
     });
-    managerToken = managerLogin.body.token;
+    managerToken = sessionToken(managerLogin);
 
     const adminLogin = await request(app).post('/api/auth/login').send({
         email: TEST_EMAILS.admin, password: 'password123',
     });
-    adminToken = adminLogin.body.token;
+    adminToken = sessionToken(adminLogin);
 
     // Create a project as manager, and a report as the team member, to test ownership on
     const projectRes = await request(app)
@@ -311,5 +315,21 @@ describe('Project member management', () => {
             .delete(`/api/projects/${testProjectId}/members/${managerId}`)
             .set('Authorization', `Bearer ${adminToken}`);
         expect(res.status).toBe(204);
+    });
+});
+
+describe('Session revocation', () => {
+    it('invalidates the current session after logout', async () => {
+        const logoutRes = await request(app)
+            .post('/api/auth/logout')
+            .set('Authorization', `Bearer ${adminToken}`);
+
+        expect(logoutRes.status).toBe(204);
+
+        const afterLogoutRes = await request(app)
+            .get('/api/reports')
+            .set('Authorization', `Bearer ${adminToken}`);
+
+        expect(afterLogoutRes.status).toBe(401);
     });
 });
