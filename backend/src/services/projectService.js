@@ -10,18 +10,22 @@ async function getAllProjects(user) {
         };
     }
 
+    const includeMembers = user && ['MANAGER', 'ADMIN'].includes(user.role);
+
     return prisma.project.findMany({
         where,
         orderBy: { name: 'asc' },
-        include: {
-            projectMembers: {
-                include: {
-                    user: {
-                        select: { id: true, name: true, email: true, role: true, isActive: true }
+        ...(includeMembers && {
+            include: {
+                projectMembers: {
+                    include: {
+                        user: {
+                            select: { id: true, name: true, email: true, role: true, isActive: true }
+                        }
                     }
                 }
             }
-        }
+        })
     });
 }
 
@@ -42,13 +46,23 @@ async function deleteProject(id) {
     return prisma.project.delete({ where: { id } });
 }
 
-async function addProjectMember(projectId, userId) {
+async function addProjectMember(projectId, userId, requestingUser) {
+    const targetUser = await prisma.user.findUnique({ where: { id: userId } });
+    if (!targetUser) throw new Error('User not found');
+    if (requestingUser.role === 'MANAGER' && ['MANAGER', 'ADMIN'].includes(targetUser.role)) {
+        throw new Error('Forbidden: Managers cannot add Managers or Admins to projects');
+    }
     return prisma.projectMember.create({
         data: { projectId, userId }
     });
 }
 
-async function removeProjectMember(projectId, userId) {
+async function removeProjectMember(projectId, userId, requestingUser) {
+    const targetUser = await prisma.user.findUnique({ where: { id: userId } });
+    if (!targetUser) throw new Error('User not found');
+    if (requestingUser.role === 'MANAGER' && ['MANAGER', 'ADMIN'].includes(targetUser.role)) {
+        throw new Error('Forbidden: Managers cannot remove Managers or Admins from projects');
+    }
     return prisma.projectMember.delete({
         where: {
             projectId_userId: { projectId, userId }
@@ -56,10 +70,10 @@ async function removeProjectMember(projectId, userId) {
     });
 }
 
-module.exports = { 
-    getAllProjects, 
-    createProject, 
-    updateProject, 
+module.exports = {
+    getAllProjects,
+    createProject,
+    updateProject,
     deleteProject,
     addProjectMember,
     removeProjectMember

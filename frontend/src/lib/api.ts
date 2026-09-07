@@ -120,8 +120,13 @@ export const managerReportsApi = {
 //team dashboard
 export type BasicUser = { id: string; name: string; email: string };
 
+export type TeamUser = BasicUser & {
+  role: 'TEAM_MEMBER';
+  isActive: boolean;
+};
+
 export const usersApi = {
-  list: (): Promise<BasicUser[]> => apiFetch('/users'),
+  list: (): Promise<TeamUser[]> => apiFetch('/users'),
 };
 
 export type AdminUser = {
@@ -130,7 +135,7 @@ export type AdminUser = {
   email: string;
   role: 'TEAM_MEMBER' | 'MANAGER' | 'ADMIN';
   isActive: boolean;
-  createdAt: string;
+  createdAt?: string;
 };
 
 export const usersAdminApi = {

@@ -157,6 +157,21 @@ describe('Role-based access — manager/admin-only routes', () => {
             .set('Authorization', `Bearer ${adminToken}`);
         expect(res.status).toBe(200);
     });
+
+    it('allows a MANAGER to load active team members for project management', async () => {
+        const res = await request(app)
+            .get('/api/users')
+            .set('Authorization', `Bearer ${managerToken}`);
+
+        expect(res.status).toBe(200);
+        expect(res.body).toEqual(expect.arrayContaining([
+            expect.objectContaining({
+                id: expect.any(String),
+                role: 'TEAM_MEMBER',
+                isActive: true,
+            }),
+        ]));
+    });
 });
 
 describe('Ownership-based access — reports', () => {
@@ -193,5 +208,108 @@ describe('Ownership-based access — reports', () => {
                 tasks: [], highlights: [], hoursBreakdown: [],
             });
         expect(res.status).toBe(403);
+    });
+});
+
+describe('Project member management', () => {
+    let memberId, otherMemberId, managerId, adminId;
+
+    beforeAll(async () => {
+        const m = await prisma.user.findUnique({ where: { email: TEST_EMAILS.member } });
+        memberId = m.id;
+        const oM = await prisma.user.findUnique({ where: { email: TEST_EMAILS.otherMember } });
+        otherMemberId = oM.id;
+        const mM = await prisma.user.findUnique({ where: { email: TEST_EMAILS.manager } });
+        managerId = mM.id;
+        const aM = await prisma.user.findUnique({ where: { email: TEST_EMAILS.admin } });
+        adminId = aM.id;
+    });
+
+    it('allows MANAGERs and ADMINs to see project members', async () => {
+        const managerRes = await request(app)
+            .get('/api/projects')
+            .set('Authorization', `Bearer ${managerToken}`);
+        const adminRes = await request(app)
+            .get('/api/projects')
+            .set('Authorization', `Bearer ${adminToken}`);
+
+        expect(managerRes.status).toBe(200);
+        expect(adminRes.status).toBe(200);
+        expect(managerRes.body.find((project) => project.id === testProjectId)).toHaveProperty('projectMembers');
+        expect(adminRes.body.find((project) => project.id === testProjectId)).toHaveProperty('projectMembers');
+    });
+
+    it('does not expose project members to a TEAM_MEMBER', async () => {
+        const memberRes = await request(app)
+            .post(`/api/projects/${testProjectId}/members`)
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send({ userId: memberId });
+
+        expect(memberRes.status).toBe(201);
+
+        const res = await request(app)
+            .get('/api/projects')
+            .set('Authorization', `Bearer ${memberToken}`);
+
+        expect(res.status).toBe(200);
+        expect(res.body.find((project) => project.id === testProjectId)).not.toHaveProperty('projectMembers');
+    });
+
+    it('blocks a TEAM_MEMBER from adding or removing project members', async () => {
+        const addRes = await request(app)
+            .post(`/api/projects/${testProjectId}/members`)
+            .set('Authorization', `Bearer ${memberToken}`)
+            .send({ userId: otherMemberId });
+        const removeRes = await request(app)
+            .delete(`/api/projects/${testProjectId}/members/${otherMemberId}`)
+            .set('Authorization', `Bearer ${memberToken}`);
+
+        expect(addRes.status).toBe(403);
+        expect(removeRes.status).toBe(403);
+    });
+
+    it('allows a MANAGER to add a TEAM_MEMBER to a project', async () => {
+        const res = await request(app)
+            .post(`/api/projects/${testProjectId}/members`)
+            .set('Authorization', `Bearer ${managerToken}`)
+            .send({ userId: otherMemberId });
+        expect(res.status).toBe(201);
+    });
+
+    it('allows a MANAGER to remove a TEAM_MEMBER from a project', async () => {
+        const res = await request(app)
+            .delete(`/api/projects/${testProjectId}/members/${otherMemberId}`)
+            .set('Authorization', `Bearer ${managerToken}`);
+        expect(res.status).toBe(204);
+    });
+
+    it('blocks a MANAGER from adding another MANAGER to a project', async () => {
+        const res = await request(app)
+            .post(`/api/projects/${testProjectId}/members`)
+            .set('Authorization', `Bearer ${managerToken}`)
+            .send({ userId: managerId });
+        expect(res.status).toBe(403);
+    });
+
+    it('allows an ADMIN to add a MANAGER to a project', async () => {
+        const res = await request(app)
+            .post(`/api/projects/${testProjectId}/members`)
+            .set('Authorization', `Bearer ${adminToken}`)
+            .send({ userId: managerId });
+        expect(res.status).toBe(201);
+    });
+
+    it('blocks a MANAGER from removing a MANAGER from a project', async () => {
+        const res = await request(app)
+            .delete(`/api/projects/${testProjectId}/members/${managerId}`)
+            .set('Authorization', `Bearer ${managerToken}`);
+        expect(res.status).toBe(403);
+    });
+
+    it('allows an ADMIN to remove a MANAGER from a project', async () => {
+        const res = await request(app)
+            .delete(`/api/projects/${testProjectId}/members/${managerId}`)
+            .set('Authorization', `Bearer ${adminToken}`);
+        expect(res.status).toBe(204);
     });
 });

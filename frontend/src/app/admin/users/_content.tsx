@@ -3,7 +3,7 @@ import { useEffect, useState, FormEvent } from 'react';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/hooks/useTheme';
-import { usersAdminApi, AdminUser, projectsApi, Project } from '@/lib/api';
+import { usersAdminApi, usersApi, AdminUser, projectsApi, Project } from '@/lib/api';
 import ManagerSidebar from '@/components/ManagerSidebar';
 import { useSearchParams, useRouter } from 'next/navigation';
 
@@ -57,7 +57,7 @@ export default function UserManagementContent() {
         setLoading(true);
         try {
             const [usersData, projectsData] = await Promise.all([
-                user?.role === 'ADMIN' || user?.role === 'MANAGER' ? usersAdminApi.listAll() : Promise.resolve([]),
+                user?.role === 'ADMIN' ? usersAdminApi.listAll() : user?.role === 'MANAGER' ? usersApi.list() : Promise.resolve([]),
                 projectsApi.list()
             ]);
             setUsers(usersData);
@@ -69,7 +69,9 @@ export default function UserManagementContent() {
         }
     }
 
-    useEffect(() => { loadData(); }, []);
+    useEffect(() => {
+        if (user?.role) loadData();
+    }, [user?.role]);
 
     // -- User Actions --
     async function handleInviteSubmit(e: FormEvent) {
@@ -280,7 +282,7 @@ export default function UserManagementContent() {
 
                                 {/* TEAMS TAB */}
                                 {activeTab === 'teams' && (
-                                    <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+                                    <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-visible">
                                         <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50">
                                             <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Teams</h2>
                                             <button onClick={() => setShowTeamModal(true)} className="bg-indigo-600 text-white text-sm font-medium px-4 py-2 rounded-lg shadow-sm hover:bg-indigo-700 transition-all flex items-center gap-2 border-none cursor-pointer">
@@ -375,7 +377,7 @@ export default function UserManagementContent() {
                                                                         </div>
 
                                                                         {openDropdownId === project.id && availableUsers.length > 0 && (
-                                                                            <div className="absolute z-10 w-full mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md shadow-lg max-h-60 overflow-auto">
+                                                                            <div className="absolute z-20 w-full mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md shadow-lg max-h-60 overflow-auto">
                                                                                 {availableUsers.map(u => (
                                                                                     <div
                                                                                         key={u.id}

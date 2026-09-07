@@ -51,9 +51,10 @@ async function addMember(req, res) {
     try {
         const { userId } = req.body;
         if (!userId) return res.status(400).json({ error: 'userId is required' });
-        const member = await addProjectMember(req.params.id, userId);
+        const member = await addProjectMember(req.params.id, userId, req.user);
         res.status(201).json(member);
     } catch (err) {
+        if (err.message.startsWith('Forbidden')) return res.status(403).json({ error: err.message });
         res.status(400).json({ error: err.message });
     }
 }
@@ -61,9 +62,10 @@ async function addMember(req, res) {
 async function removeMember(req, res) {
     try {
         const { userId } = req.params;
-        await removeProjectMember(req.params.id, userId);
+        await removeProjectMember(req.params.id, userId, req.user);
         res.status(204).send();
     } catch (err) {
+        if (err.message.startsWith('Forbidden')) return res.status(403).json({ error: err.message });
         res.status(400).json({ error: err.message });
     }
 }
