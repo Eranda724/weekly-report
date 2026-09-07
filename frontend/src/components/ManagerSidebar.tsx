@@ -99,6 +99,17 @@ function ManagerSidebarContent() {
                                     <span className="flex items-center justify-center w-5 h-5"><img src="/assets/project.png" alt="Projects" className="w-full h-full object-contain opacity-80 group-hover:opacity-100 dark:invert" /></span> Projects
                                 </Link>
                             </li>
+                            <li>
+                                <Link
+                                    href="/admin/categories"
+                                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium no-underline transition-all duration-150 ${isActive('/admin/categories')
+                                        ? 'bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 border border-violet-100 dark:border-violet-800/50 shadow-sm'
+                                        : 'text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-900/20'
+                                        }`}
+                                >
+                                    <span className="flex items-center justify-center w-5 h-5"><img src="/assets/project.png" alt="Categories" className="w-full h-full object-contain opacity-80 dark:invert" /></span> Categories
+                                </Link>
+                            </li>
                         </ul>
                     </div>
                 )}

@@ -1,6 +1,8 @@
 const prisma = require('../config/prisma');
+const { validateReportData } = require('../validation/reportValidation');
 
 async function createDraftReport(userId, data) {
+    validateReportData(data);
     const {
         projectId,
         category,
@@ -91,6 +93,7 @@ async function getReportById(reportId, requestingUser) {
     return report;
 }
 async function updateReport(reportId, userId, data) {
+    validateReportData(data);
     const existing = await prisma.report.findUnique({ where: { id: reportId } });
 
     if (!existing) throw new Error('Report not found');

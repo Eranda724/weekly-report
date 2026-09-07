@@ -84,8 +84,8 @@ export default function ReportForm({ initialData, onSave, saveLabel }: Props) {
             )}
 
             {/* Section 1 — Week & Project */}
-            <SectionCard title="Week, Project & Category">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <SectionCard title="">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <label className={labelCls}>
                             Week Starting

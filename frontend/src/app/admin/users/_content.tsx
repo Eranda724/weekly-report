@@ -3,7 +3,7 @@ import { useEffect, useState, FormEvent } from 'react';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { useAuth } from '@/context/AuthContext';
 import { useTheme } from '@/hooks/useTheme';
-import { usersAdminApi, usersApi, AdminUser, categoriesApi, Category, projectsApi, Project } from '@/lib/api';
+import { usersAdminApi, usersApi, AdminUser, projectsApi, Project } from '@/lib/api';
 import ManagerSidebar from '@/components/ManagerSidebar';
 import { useSearchParams, useRouter } from 'next/navigation';
 
@@ -26,7 +26,6 @@ export default function UserManagementContent() {
     // Data states
     const [users, setUsers] = useState<AdminUser[]>([]);
     const [projects, setProjects] = useState<Project[]>([]);
-    const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [busyId, setBusyId] = useState<string | null>(null);
@@ -41,11 +40,8 @@ export default function UserManagementContent() {
     };
     const [showInviteModal, setShowInviteModal] = useState(false);
     const [showTeamModal, setShowTeamModal] = useState(false);
-    const [categoryForm, setCategoryForm] = useState({ name: '' });
     const [editingProjectId, setEditingProjectId] = useState<string | null>(null);
     const [editingProjectName, setEditingProjectName] = useState('');
-    const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
-    const [editingCategoryName, setEditingCategoryName] = useState('');
 
     // Form States
     const [inviteForm, setInviteForm] = useState({ name: '', email: '', password: '', role: 'TEAM_MEMBER' });
@@ -62,14 +58,12 @@ export default function UserManagementContent() {
     async function loadData() {
         setLoading(true);
         try {
-            const [usersData, projectsData, categoriesData] = await Promise.all([
+            const [usersData, projectsData] = await Promise.all([
                 user?.role === 'ADMIN' ? usersAdminApi.listAll() : user?.role === 'MANAGER' ? usersApi.list() : Promise.resolve([]),
                 projectsApi.list(),
-                categoriesApi.list(),
             ]);
             setUsers(usersData);
             setProjects(projectsData);
-            setCategories(categoriesData);
         } catch (err: any) {
             setError(err.message || 'Failed to load data');
         } finally {
@@ -200,48 +194,6 @@ export default function UserManagementContent() {
         }
     }
 
-    async function handleCreateCategory(e: FormEvent) {
-        e.preventDefault();
-        if (!categoryForm.name.trim()) return;
-        setBusyId('create-category');
-        try {
-            await categoriesApi.create(categoryForm.name);
-            setCategoryForm({ name: '' });
-            await loadData();
-        } catch (err: any) {
-            setError(err.message);
-        } finally {
-            setBusyId(null);
-        }
-    }
-
-    async function handleUpdateCategory(id: string) {
-        if (!editingCategoryName.trim()) return;
-        setBusyId(`edit-category-${id}`);
-        try {
-            await categoriesApi.update(id, editingCategoryName.trim());
-            setEditingCategoryId(null);
-            await loadData();
-        } catch (err: any) {
-            setError(err.message);
-        } finally {
-            setBusyId(null);
-        }
-    }
-
-    async function handleDeleteCategory(id: string) {
-        if (!confirm('Delete this category? Existing reports will keep their saved category.')) return;
-        setBusyId(`del-category-${id}`);
-        try {
-            await categoriesApi.remove(id);
-            await loadData();
-        } catch (err: any) {
-            setError(err.message);
-        } finally {
-            setBusyId(null);
-        }
-    }
-
     const initial = user?.name?.[0]?.toUpperCase() ?? '?';
 
 
@@ -346,7 +298,6 @@ export default function UserManagementContent() {
 
                                 {/* TEAMS TAB */}
                                 {activeTab === 'teams' && (
-                                    <>
                                     <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-visible">
                                         <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50">
                                             <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Teams</h2>
@@ -515,47 +466,6 @@ export default function UserManagementContent() {
                                             </div>
                                         )}
                                     </div>
-                                    <div className="mt-6 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
-                                        <div className="p-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
-                                            <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Categories</h2>
-                                        </div>
-                                        <div className="p-6 space-y-3">
-                                            <form onSubmit={handleCreateCategory} className="flex gap-2">
-                                                <input
-                                                    required
-                                                    value={categoryForm.name}
-                                                    onChange={(e) => setCategoryForm({ name: e.target.value })}
-                                                    placeholder="New category name"
-                                                    className="flex-1 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-slate-100"
-                                                />
-                                                <button type="submit" disabled={busyId === 'create-category'} className="bg-indigo-600 text-white font-medium px-4 py-2 rounded-lg border-none cursor-pointer disabled:opacity-50">Add Category</button>
-                                            </form>
-                                            {categories.length === 0 && <p className="text-sm text-slate-500 dark:text-slate-400">No categories yet.</p>}
-                                            {categories.map((category) => (
-                                                <div key={category.id} className="flex items-center gap-2 border-t border-slate-100 dark:border-slate-800 pt-3">
-                                                    {editingCategoryId === category.id ? (
-                                                        <>
-                                                            <input
-                                                                value={editingCategoryName}
-                                                                onChange={(e) => setEditingCategoryName(e.target.value)}
-                                                                className="flex-1 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-900 dark:text-slate-100"
-                                                                autoFocus
-                                                            />
-                                                            <button onClick={() => handleUpdateCategory(category.id)} disabled={busyId === `edit-category-${category.id}`} className="text-xs text-indigo-600 font-semibold bg-transparent border-none cursor-pointer">Save</button>
-                                                            <button onClick={() => setEditingCategoryId(null)} className="text-xs text-slate-500 bg-transparent border-none cursor-pointer">Cancel</button>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <span className="flex-1 text-sm font-medium text-slate-700 dark:text-slate-200">{category.name}</span>
-                                                            <button onClick={() => { setEditingCategoryId(category.id); setEditingCategoryName(category.name); }} className="text-xs text-indigo-600 font-semibold bg-transparent border-none cursor-pointer">Edit</button>
-                                                            <button onClick={() => handleDeleteCategory(category.id)} disabled={busyId === `del-category-${category.id}`} className="text-xs text-red-600 font-semibold bg-transparent border-none cursor-pointer disabled:opacity-50">Delete</button>
-                                                        </>
-                                                    )}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                    </>
                                 )}
                             </div>
                         )}
