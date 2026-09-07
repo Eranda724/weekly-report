@@ -1,7 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { projectsApi } from '@/lib/api';
-import { Project } from '@/lib/api';
+import { categoriesApi, Category, projectsApi, Project } from '@/lib/api';
 import { ReportFormData } from '@/types/report';
 import TaskTable from '@/components/reports/TaskTable';
 import HighlightsSection from '@/components/reports/HighlightsSection';
@@ -32,12 +31,18 @@ const labelCls = 'block text-xs font-semibold text-slate-500 dark:text-slate-400
 
 export default function ReportForm({ initialData, onSave, saveLabel }: Props) {
     const [projects, setProjects] = useState<Project[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
     const [form, setForm] = useState<ReportFormData>(initialData);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
 
     useEffect(() => {
-        projectsApi.list().then(setProjects).catch((err) => setError(err.message));
+        Promise.all([projectsApi.list(), categoriesApi.list()])
+            .then(([projectData, categoryData]) => {
+                setProjects(projectData);
+                setCategories(categoryData);
+            })
+            .catch((err) => setError(err.message));
     }, []);
 
     function updateField<K extends keyof ReportFormData>(key: K, value: ReportFormData[K]) {
@@ -55,7 +60,7 @@ export default function ReportForm({ initialData, onSave, saveLabel }: Props) {
 
     async function save() {
         setError('');
-        if (!form.projectId || !form.category.trim() || !form.weekStartDate) {
+        if (!form.projectId || !form.categoryId || !form.weekStartDate) {
             setError('Project, category, and week are required.');
             return;
         }
@@ -113,14 +118,21 @@ export default function ReportForm({ initialData, onSave, saveLabel }: Props) {
                         <label className={labelCls}>
                             Category
                         </label>
-                        <input
-                            type="text"
-                            value={form.category}
-                            onChange={(e) => updateField('category', e.target.value)}
+                        <select
+                            value={form.categoryId || ''}
+                            onChange={(e) => {
+                                const selected = categories.find((category) => category.id === e.target.value);
+                                updateField('categoryId', e.target.value);
+                                updateField('category', selected?.name || '');
+                            }}
                             className={inputCls}
-                            placeholder="e.g. Backend, Design, Planning"
                             required
-                        />
+                        >
+                            <option value="">Select a category...</option>
+                            {categories.map((category) => (
+                                <option key={category.id} value={category.id}>{category.name}</option>
+                            ))}
+                        </select>
                     </div>
                 </div>
             </SectionCard>

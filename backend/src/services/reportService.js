@@ -4,6 +4,7 @@ async function createDraftReport(userId, data) {
     const {
         projectId,
         category,
+        categoryId,
         weekStartDate,
         tasksNextWeek,
         notesLinks,
@@ -18,6 +19,7 @@ async function createDraftReport(userId, data) {
                 userId,
                 projectId,
                 category,
+                ...(categoryId ? { categoryId } : {}),
                 weekStartDate: new Date(weekStartDate),
                 status: 'DRAFT',
                 tasksNextWeek,
@@ -63,6 +65,7 @@ async function getReportById(reportId, requestingUser) {
             highlights: true,
             hoursBreakdown: true,
             project: { include: { projectMembers: true } },
+            categoryRef: true,
             user: { select: { id: true, name: true, email: true } },
             versions: { orderBy: { versionNumber: 'desc' } },
             reviewComments: { orderBy: { createdAt: 'desc' } },
@@ -99,6 +102,7 @@ async function updateReport(reportId, userId, data) {
     const {
         projectId,
         category,
+        categoryId,
         weekStartDate,
         tasksNextWeek,
         notesLinks,
@@ -124,6 +128,7 @@ async function updateReport(reportId, userId, data) {
             data: {
                 projectId,
                 ...(category !== undefined ? { category } : {}),
+                ...(categoryId !== undefined ? { categoryId: categoryId || null } : {}),
                 weekStartDate: new Date(weekStartDate),
                 tasksNextWeek,
                 notesLinks,
@@ -272,7 +277,7 @@ async function listAllReports(requestingUser, filters = {}) {
             orderBy: { weekStartDate: 'desc' },
             skip: (page - 1) * pageSize,
             take: pageSize,
-            include: { project: true, user: { select: { id: true, name: true, email: true } } },
+            include: { project: true, categoryRef: true, user: { select: { id: true, name: true, email: true } } },
         }),
         prisma.report.count({ where }),
     ]);

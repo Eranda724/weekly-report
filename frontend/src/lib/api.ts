@@ -40,6 +40,12 @@ export type Project = {
   projectMembers?: ProjectMember[];
 };
 
+export type Category = {
+  id: string;
+  name: string;
+  isActive: boolean;
+};
+
 export const projectsApi = {
   list: (): Promise<Project[]> => apiFetch('/projects'),
   create: (name: string): Promise<Project> =>
@@ -52,6 +58,16 @@ export const projectsApi = {
     apiFetch(`/projects/${projectId}/members`, { method: 'POST', body: JSON.stringify({ userId }) }),
   removeMember: (projectId: string, userId: string): Promise<void> =>
     apiFetch(`/projects/${projectId}/members/${userId}`, { method: 'DELETE' }),
+};
+
+export const categoriesApi = {
+  list: (): Promise<Category[]> => apiFetch('/categories'),
+  create: (name: string): Promise<Category> =>
+    apiFetch('/categories', { method: 'POST', body: JSON.stringify({ name }) }),
+  update: (id: string, name: string): Promise<Category> =>
+    apiFetch(`/categories/${id}`, { method: 'PUT', body: JSON.stringify({ name }) }),
+  remove: (id: string): Promise<void> =>
+    apiFetch(`/categories/${id}`, { method: 'DELETE' }),
 };
 
 export const reportsApi = {

@@ -30,6 +30,7 @@ export type HoursBreakdownEntry = {
 export type ReportFormData = {
     projectId: string;
     category: string;
+    categoryId?: string;
     weekStartDate: string; // yyyy-mm-dd
     tasksNextWeek: string;
     notesLinks: string;
@@ -46,6 +47,7 @@ export type Report = ReportFormData & {
     submittedAt: string | null;
     approvedAt: string | null;
     project?: { id: string; name: string };
+    categoryRef?: { id: string; name: string } | null;
     user?: { id: string; name: string; email: string };
     versions?: { id: string; versionNumber: number; submittedAt: string; contentSnapshot: string }[];
     reviewComments?: {
