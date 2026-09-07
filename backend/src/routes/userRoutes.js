@@ -7,7 +7,7 @@ const {
 } = require('../controllers/userController');
 
 router.get('/', requireAuth, requireRole('MANAGER', 'ADMIN'), list);
-router.get('/admin/all', requireAuth, requireRole('MANAGER', 'ADMIN'), listAllForAdmin);
+router.get('/admin/all', requireAuth, requireRole('ADMIN'), listAllForAdmin);
 router.post('/admin/create', requireAuth, requireRole('ADMIN'), create);
 router.put('/admin/:id/role', requireAuth, requireRole('ADMIN'), updateRole);
 router.put('/admin/:id/deactivate', requireAuth, requireRole('ADMIN'), deactivate);

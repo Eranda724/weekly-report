@@ -109,6 +109,10 @@ export default function ReportDetailPage() {
         APPROVED: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30',
     };
 
+    const isDraftState = ['DRAFT', 'NEEDS_CORRECTION'].includes(report.status);
+    const sortedVersions = report.versions ? [...report.versions].sort((a, b) => b.versionNumber - a.versionNumber) : [];
+    const hasHistory = sortedVersions.length > 0;
+
     const TopBar = (
         <div className="sticky top-0 z-20 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 px-6 h-16 flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -182,7 +186,7 @@ export default function ReportDetailPage() {
                                     {report.status.replace('_', ' ')}
                                 </span>
 
-                                {report.versions && report.versions.length > 0 && (
+                                {hasHistory && (
                                     <div className="flex flex-col items-center sm:items-end gap-1 mt-1">
                                         <label className="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 font-bold">History</label>
                                         <select
@@ -190,12 +194,19 @@ export default function ReportDetailPage() {
                                             onChange={(e) => setSelectedVersionId(e.target.value)}
                                             className="bg-slate-50 dark:bg-slate-900 text-slate-700 dark:text-slate-300 font-semibold text-sm rounded-lg px-3 py-1.5 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer shadow-sm"
                                         >
-                                            <option value="latest">Latest Version</option>
-                                            {report.versions.sort((a, b) => b.versionNumber - a.versionNumber).map(v => (
-                                                <option key={v.id} value={v.id}>
-                                                    v{v.versionNumber} ({new Date(v.submittedAt).toLocaleDateString()})
-                                                </option>
-                                            ))}
+                                            {isDraftState ? (
+                                                <option value="latest">Current Draft</option>
+                                            ) : (
+                                                <option value="latest">Latest Version</option>
+                                            )}
+                                            {sortedVersions.map((v, i) => {
+                                                if (!isDraftState && i === 0) return null;
+                                                return (
+                                                    <option key={v.id} value={v.id}>
+                                                        v{v.versionNumber} ({new Date(v.submittedAt).toLocaleDateString()})
+                                                    </option>
+                                                );
+                                            })}
                                         </select>
                                     </div>
                                 )}

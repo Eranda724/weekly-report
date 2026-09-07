@@ -66,6 +66,8 @@ export default function EditReportPage() {
         hoursBreakdown: report.hoursBreakdown,
     };
 
+    const activeVersionComment = report.reviewComments?.[0];
+
     return (
         <ProtectedRoute allowedRoles={['TEAM_MEMBER']}>
             <div className="min-h-screen bg-slate-50 dark:bg-slate-900/40 relative overflow-hidden pb-12">
@@ -86,6 +88,16 @@ export default function EditReportPage() {
                     </div>
 
                     <main>
+                        {activeVersionComment && activeVersionComment.decision === 'NEEDS_CORRECTION' && (
+                            <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-300 dark:border-amber-700/50 rounded-3xl p-6 shadow-sm mb-8">
+                                <div className="flex items-start gap-3">
+                                    <div>
+                                        <h3 className="font-bold text-amber-800 dark:text-amber-400 mb-1">Manager requested changes</h3>
+                                        <p className="text-sm text-amber-900 dark:text-amber-200/90 whitespace-pre-wrap">{activeVersionComment.commentText}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                         <ReportForm initialData={initialData} onSave={handleSave} saveLabel="Save Changes" />
                     </main>
                 </div>
