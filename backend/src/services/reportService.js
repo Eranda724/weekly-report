@@ -190,7 +190,7 @@ async function listMyReports(userId, filters = {}) {
     const [reports, total] = await Promise.all([
         prisma.report.findMany({
             where,
-            orderBy: { weekStartDate: 'desc' },
+            orderBy: { createdAt: 'desc' },
             skip: (page - 1) * pageSize,
             take: pageSize,
             include: { project: true },

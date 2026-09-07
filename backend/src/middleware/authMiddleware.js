@@ -19,11 +19,19 @@ async function requireAuth(req, res, next) {
 
     try {
         const decoded = verifyToken(token);
-        const session = await prisma.session.findUnique({ where: { id: decoded.jti } });
-        if (!session || session.revokedAt || session.expiresAt <= new Date() || session.userId !== decoded.id) {
+        const session = await prisma.session.findUnique({
+            where: { id: decoded.jti },
+            include: { user: true },
+        });
+        if (!session || !session.user || !session.user.isActive || session.revokedAt || session.expiresAt <= new Date() || session.userId !== decoded.id) {
             return res.status(401).json({ error: 'Invalid or expired session' });
         }
-        req.user = decoded; // { id, role, email }
+        req.user = {
+            id: session.user.id,
+            name: session.user.name,
+            email: session.user.email,
+            role: session.user.role,
+        };
         req.sessionId = decoded.jti;
         next();
     } catch (err) {

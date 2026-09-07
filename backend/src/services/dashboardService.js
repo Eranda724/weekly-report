@@ -146,12 +146,17 @@ async function getWorkloadByProject(weekStartDate) {
 
     const reports = await prisma.report.findMany({
         where,
-        select: { project: { select: { name: true } }, tasks: { select: { id: true } } },
+        select: {
+            project: { select: { name: true } },
+            categoryRef: { select: { name: true } },
+            category: true,
+            tasks: { select: { id: true } }
+        },
     });
 
     const byProject = new Map();
     for (const r of reports) {
-        const name = r.project?.name || 'Unassigned';
+        const name = r.project?.name || r.categoryRef?.name || (r.category ? r.category : 'Unassigned');
         byProject.set(name, (byProject.get(name) || 0) + r.tasks.length);
     }
 

@@ -10,7 +10,31 @@ type Props = {
     initialData: ReportFormData;
     onSave: (data: ReportFormData) => Promise<void>;
     saveLabel: string;
+    clearable?: boolean;
 };
+
+function makeBlankForm(base: ReportFormData): ReportFormData {
+    return {
+        projectId: base.projectId,
+        category: base.category,
+        categoryId: base.categoryId,
+        weekStartDate: base.weekStartDate,
+        tasksNextWeek: '',
+        notesLinks: '',
+        tasks: [{
+            taskName: '',
+            priority: 'MEDIUM' as const,
+            plannedPct: 0,
+            actualPct: 0,
+            status: 'IN PROGRESS',
+            timePlannedHrs: 0,
+            timeSpentHrs: 0,
+            deliverable: '',
+        }],
+        highlights: [],
+        hoursBreakdown: [],
+    };
+}
 
 function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
     return (
@@ -29,7 +53,7 @@ function SectionCard({ title, children }: { title: string; children: React.React
 const inputCls = 'w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-[#0f172a] text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 text-sm px-4 py-2.5 outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all duration-200 dark:[color-scheme:dark]';
 const labelCls = 'block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2';
 
-export default function ReportForm({ initialData, onSave, saveLabel }: Props) {
+export default function ReportForm({ initialData, onSave, saveLabel, clearable }: Props) {
     const [projects, setProjects] = useState<Project[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
     const [form, setForm] = useState<ReportFormData>(initialData);
@@ -66,7 +90,18 @@ export default function ReportForm({ initialData, onSave, saveLabel }: Props) {
         }
         setSaving(true);
         try {
-            await onSave(form);
+            await onSave({
+                ...form,
+                tasks: form.tasks.map((task) => ({
+                    ...task,
+                    timePlannedHrs: Number(task.timePlannedHrs),
+                    timeSpentHrs: Number(task.timeSpentHrs),
+                })),
+                hoursBreakdown: form.hoursBreakdown.map((entry) => ({
+                    ...entry,
+                    hoursSpent: Number(entry.hoursSpent),
+                })),
+            });
         } catch (err: any) {
             setError(err.message);
         } finally {
@@ -194,24 +229,43 @@ export default function ReportForm({ initialData, onSave, saveLabel }: Props) {
                 </SectionCard>
             </div>
 
-            {/* Action Buttons - Aligned right, matching the 'Review ->' pill buttons */}
-            <div className="flex items-center justify-end gap-4 pt-2 pb-10">
-                <button
-                    type="button"
-                    onClick={handleDraftSave}
-                    disabled={saving}
-                    className="bg-white dark:bg-transparent border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 font-medium text-sm px-6 py-2.5 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors disabled:opacity-50 cursor-pointer shadow-sm dark:shadow-none"
-                >
-                    {saving ? 'Saving…' : saveLabel}
-                </button>
-                <button
-                    type="submit"
-                    disabled={saving}
-                    className="bg-violet-600 hover:bg-violet-500 text-white font-medium text-sm px-7 py-2.5 rounded-lg shadow-lg shadow-violet-200 dark:shadow-violet-900/20 transition-all disabled:opacity-50 cursor-pointer border-none flex items-center gap-2"
-                >
-                    {saving ? 'Saving…' : 'Save & Continue'}
-                    {!saving && <span>&rarr;</span>}
-                </button>
+            {/* Action Buttons */}
+            <div className="flex items-center justify-between pt-2 pb-10">
+                {clearable ? (
+                    <button
+                        type="button"
+                        onClick={() => {
+                            if (confirm('Clear all form content? The week and project will be kept.')) {
+                                setForm(makeBlankForm(form));
+                            }
+                        }}
+                        className="flex items-center gap-1.5 text-sm font-medium text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40 px-4 py-2.5 rounded-lg transition-all cursor-pointer hover:bg-red-100 dark:hover:bg-red-900/40"
+                    >
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        Clear All
+                    </button>
+                ) : <span />}
+
+                <div className="flex items-center gap-4">
+                    <button
+                        type="button"
+                        onClick={handleDraftSave}
+                        disabled={saving}
+                        className="bg-white dark:bg-transparent border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 font-medium text-sm px-6 py-2.5 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors disabled:opacity-50 cursor-pointer shadow-sm dark:shadow-none"
+                    >
+                        {saving ? 'Saving…' : saveLabel}
+                    </button>
+                    <button
+                        type="submit"
+                        disabled={saving}
+                        className="bg-violet-600 hover:bg-violet-500 text-white font-medium text-sm px-7 py-2.5 rounded-lg shadow-lg shadow-violet-200 dark:shadow-violet-900/20 transition-all disabled:opacity-50 cursor-pointer border-none flex items-center gap-2"
+                    >
+                        {saving ? 'Saving…' : 'Save & Continue'}
+                        {!saving && <span>&rarr;</span>}
+                    </button>
+                </div>
             </div>
         </form>
     );

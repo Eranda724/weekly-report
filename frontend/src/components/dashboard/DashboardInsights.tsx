@@ -86,8 +86,8 @@ function RecentActivityFeed({ activityFeed }: { activityFeed: DashboardMetrics['
 
 function ReportSubmissionStatus({ statusByMember }: { statusByMember: DashboardMetrics['statusByMember'] }) {
     return (
-        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-5 shadow-sm flex flex-col">
-            <h3 className="font-semibold text-slate-700 dark:text-slate-200 text-sm mb-3">
+        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-5 shadow-sm flex flex-col h-full">
+            <h3 className="font-semibold text-slate-700 dark:text-slate-200 text-sm mb-3 shrink-0">
                 Report Submission Status
             </h3>
             {statusByMember.length === 0 ? (
@@ -106,8 +106,9 @@ function ReportSubmissionStatus({ statusByMember }: { statusByMember: DashboardM
                 };
 
                 return (
-                    <div className="flex flex-col flex-1">
-                        <div className="flex items-center mb-2">
+                    <div className="flex flex-col flex-1 min-h-0">
+                        {/* Week header — fixed */}
+                        <div className="flex items-center mb-2 shrink-0">
                             <span className="w-20 shrink-0" />
                             {weeks.map((_, idx) => (
                                 <span
@@ -119,7 +120,8 @@ function ReportSubmissionStatus({ statusByMember }: { statusByMember: DashboardM
                             ))}
                         </div>
 
-                        <div className="flex flex-col flex-1 justify-between gap-2">
+                        {/* Member rows — scrollable if too many */}
+                        <div className="flex flex-col gap-2 overflow-y-auto flex-1 pr-0.5">
                             {statusByMember.map((member: any, mi: number) => (
                                 <div key={mi} className="flex items-center gap-1">
                                     <span
@@ -148,7 +150,8 @@ function ReportSubmissionStatus({ statusByMember }: { statusByMember: DashboardM
                     </div>
                 );
             })()}
-            <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-3 pt-2 border-t border-slate-100 dark:border-slate-700/50">
+            {/* Legend — fixed at bottom */}
+            <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-3 pt-2 border-t border-slate-100 dark:border-slate-700/50 shrink-0">
                 {Object.entries(STATUS_COLORS).map(([s, c]) => (
                     <LegendDot key={s} color={c} label={s.replace(/_/g, ' ')} />
                 ))}
@@ -258,128 +261,139 @@ export default function DashboardInsights({ weekStartDate }: { weekStartDate?: s
                 ))}
             </div>
 
-            {/* ── Top row: Trend & Activity Feed ── */}
-            <div className="grid grid-cols-3 gap-5">
-                <div className="col-span-2 space-y-5">
+            {/* ── Main chart area: left fixed charts, right flex column ── */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 items-stretch">
+                <div className="lg:col-span-2 flex flex-col gap-5 h-full">
                     {/* ── Task Completion Trend (full width line chart) ── */}
-                    <ChartCard title="Task Completion Trend (Team Wide)">
-                        <ResponsiveContainer width="100%" height={240}>
-                            <LineChart data={trend} margin={{ top: 4, right: 16, left: -10, bottom: 0 }}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                                <XAxis
-                                    dataKey="weekStartDate"
-                                    tick={{ fontSize: 11, fill: '#94a3b8' }}
-                                    tickFormatter={(v, i) => `Week ${i + 1}`}
-                                />
-                                <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: '#94a3b8' }} />
-                                <Tooltip
-                                    contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #e2e8f0' }}
-                                />
-                                <Legend
-                                    wrapperStyle={{ fontSize: 12, paddingTop: 8 }}
-                                    formatter={(val) => val === 'completedTasks' ? 'Tasks Completed (Done)' : val}
-                                />
-                                <Line
-                                    type="monotone"
-                                    dataKey="completedTasks"
-                                    name="Tasks Completed (Done)"
-                                    stroke="#6366F1"
-                                    strokeWidth={2.5}
-                                    dot={{ r: 4, fill: '#6366F1' }}
-                                    activeDot={{ r: 6 }}
-                                />
-                            </LineChart>
-                        </ResponsiveContainer>
-                    </ChartCard>
-                </div>
-
-                <div className="col-span-1">
-                    <ReportSubmissionStatus statusByMember={statusByMember} />
-                </div>
-            </div>
-
-            {/* ── Bottom row: 3 distinct charts ── */}
-            <div className="grid grid-cols-3 gap-5">
-                <div className="order-3">
-                    <RecentActivityFeed activityFeed={activityFeed} />
-                </div>
-
-                {/* 2: Workload by Project (Donut Chart) */}
-                <div className="order-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-5 shadow-sm flex flex-col justify-between">
-                    <h3 className="font-semibold text-slate-700 dark:text-slate-200 text-sm mb-4">
-                        Workload by Project
-                    </h3>
-                    {!workloadByProject || workloadByProject.length === 0 ? (
-                        <p className="text-xs text-slate-400 dark:text-slate-500 italic">No data.</p>
-                    ) : (
-                        <>
-                            <ResponsiveContainer width="100%" height={220}>
-                                <PieChart margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
-                                    <Pie
-                                        data={workloadByProject}
-                                        dataKey="taskCount"
-                                        nameKey="project"
-                                        cx="50%" cy="50%"
-                                        innerRadius={40}
-                                        outerRadius={70}
-                                        paddingAngle={2}
-                                        label={renderCustomizedLabel}
-                                        labelLine={false}
-                                    >
-                                        {workloadByProject.map((_, i) => (
-                                            <Cell key={i} fill={DONUT_COLORS[i % DONUT_COLORS.length]} />
-                                        ))}
-                                    </Pie>
+                    <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-5 shadow-sm flex flex-col h-[340px] shrink-0">
+                        <h3 className="font-semibold text-slate-700 dark:text-slate-200 text-sm mb-4 shrink-0">
+                            Task Completion Trend (Team Wide)
+                        </h3>
+                        <div className="flex-1 min-h-0">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <LineChart data={trend} margin={{ top: 4, right: 16, left: -10, bottom: 0 }}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                                    <XAxis
+                                        dataKey="weekStartDate"
+                                        tick={{ fontSize: 11, fill: '#94a3b8' }}
+                                        tickFormatter={(v, i) => `Week ${i + 1}`}
+                                    />
+                                    <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: '#94a3b8' }} />
                                     <Tooltip
-                                        formatter={(val: any) => [`${val} tasks`, '']}
                                         contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #e2e8f0' }}
                                     />
-                                </PieChart>
+                                    <Legend
+                                        wrapperStyle={{ fontSize: 12, paddingTop: 8 }}
+                                        formatter={(val) => val === 'completedTasks' ? 'Tasks Completed (Done)' : val}
+                                    />
+                                    <Line
+                                        type="monotone"
+                                        dataKey="completedTasks"
+                                        name="Tasks Completed (Done)"
+                                        stroke="#6366F1"
+                                        strokeWidth={2.5}
+                                        dot={{ r: 4, fill: '#6366F1' }}
+                                        activeDot={{ r: 6 }}
+                                    />
+                                </LineChart>
                             </ResponsiveContainer>
-                            <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2 text-[10px] border-t border-slate-100 dark:border-slate-700/50 pt-3">
-                                {workloadByProject.map((entry, i) => (
-                                    <LegendDot key={i} color={DONUT_COLORS[i % DONUT_COLORS.length]} label={entry.project} />
-                                ))}
-                            </div>
-                        </>
-                    )}
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 flex-1 min-h-[300px]">
+                        {/* Recent Activity Feed (swapped with Time Spent) */}
+                        <div className="flex flex-col h-full">
+                            <RecentActivityFeed activityFeed={activityFeed} />
+                        </div>
+
+                        {/* Report Submission Status (swapped with Workload) */}
+                        <div className="flex flex-col h-full">
+                            <ReportSubmissionStatus statusByMember={statusByMember} />
+                        </div>
+                    </div>
                 </div>
 
-                {/* 3: Time Spent by Task Type (Vertical Bar Chart) */}
-                <div className="order-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-5 shadow-sm flex flex-col justify-between">
-                    <h3 className="font-semibold text-slate-700 dark:text-slate-200 text-sm mb-4">
-                        Time Spent by Task Type
-                    </h3>
-                    {!timeByTaskType || timeByTaskType.length === 0 ? (
-                        <p className="text-xs text-slate-400 dark:text-slate-500 italic">No data.</p>
-                    ) : (
-                        <ResponsiveContainer width="100%" height={Math.max(220, timeByTaskType.length * 30)}>
-                            <BarChart
-                                data={timeByTaskType}
-                                layout="vertical"
-                                margin={{ top: 4, right: 12, left: 4, bottom: 4 }}
-                            >
-                                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e2e8f0" />
-                                <XAxis type="number" tick={{ fontSize: 11, fill: '#94a3b8' }} allowDecimals={false} />
-                                <YAxis
-                                    type="category"
-                                    dataKey="taskCategory"
-                                    width={88}
-                                    tick={{ fontSize: 10, fill: '#94a3b8' }}
-                                />
-                                <Tooltip
-                                    formatter={(val: any) => [`${val}h`, 'Hours']}
-                                    contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #e2e8f0' }}
-                                    cursor={{ fill: 'rgba(99, 102, 241, 0.05)' }}
-                                />
-                                <Bar dataKey="hours" fill="#10B981" radius={[0, 4, 4, 0]} barSize={18}>
-                                    {timeByTaskType.map((_, i) => (
-                                        <Cell key={i} fill={DONUT_COLORS[i % DONUT_COLORS.length]} />
+                {/* Right col: Workload + Time Spent */}
+                <div className="lg:col-span-1 flex flex-col gap-5 h-full">
+                    {/* Workload by Project (Donut Chart) */}
+                    <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-5 shadow-sm flex flex-col justify-between h-[340px] shrink-0">
+                        <h3 className="font-semibold text-slate-700 dark:text-slate-200 text-sm mb-4 shrink-0">
+                            Workload by Project
+                        </h3>
+                        {!workloadByProject || workloadByProject.length === 0 ? (
+                            <p className="text-xs text-slate-400 dark:text-slate-500 italic">No data.</p>
+                        ) : (
+                            <div className="flex flex-col flex-1 min-h-0">
+                                <div className="flex-1 min-h-0">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <PieChart margin={{ top: 10, right: 10, bottom: 10, left: 10 }}>
+                                            <Pie
+                                                data={workloadByProject}
+                                                dataKey="taskCount"
+                                                nameKey="project"
+                                                cx="50%" cy="50%"
+                                                innerRadius={40}
+                                                outerRadius={70}
+                                                paddingAngle={2}
+                                                label={renderCustomizedLabel}
+                                                labelLine={false}
+                                            >
+                                                {workloadByProject.map((_, i) => (
+                                                    <Cell key={i} fill={DONUT_COLORS[i % DONUT_COLORS.length]} />
+                                                ))}
+                                            </Pie>
+                                            <Tooltip
+                                                formatter={(val: any) => [`${val} tasks`, '']}
+                                                contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #e2e8f0' }}
+                                            />
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                </div>
+                                <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2 text-[10px] border-t border-slate-100 dark:border-slate-700/50 pt-3 shrink-0">
+                                    {workloadByProject.map((entry, i) => (
+                                        <LegendDot key={i} color={DONUT_COLORS[i % DONUT_COLORS.length]} label={entry.project} />
                                     ))}
-                                </Bar>
-                            </BarChart>
-                        </ResponsiveContainer>
-                    )}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Time Spent by Task Type (Vertical Bar Chart) */}
+                    <div className="flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-5 shadow-sm flex flex-col justify-between min-h-[300px]">
+                        <h3 className="font-semibold text-slate-700 dark:text-slate-200 text-sm mb-4">
+                            Time Spent by Task Type
+                        </h3>
+                        {!timeByTaskType || timeByTaskType.length === 0 ? (
+                            <p className="text-xs text-slate-400 dark:text-slate-500 italic">No data.</p>
+                        ) : (
+                            <ResponsiveContainer width="100%" height={Math.max(220, timeByTaskType.length * 30)}>
+                                <BarChart
+                                    data={timeByTaskType}
+                                    layout="vertical"
+                                    margin={{ top: 4, right: 12, left: 4, bottom: 4 }}
+                                >
+                                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#e2e8f0" />
+                                    <XAxis type="number" tick={{ fontSize: 11, fill: '#94a3b8' }} allowDecimals={false} />
+                                    <YAxis
+                                        type="category"
+                                        dataKey="taskCategory"
+                                        width={88}
+                                        tick={{ fontSize: 10, fill: '#94a3b8' }}
+                                    />
+                                    <Tooltip
+                                        formatter={(val: any) => [`${val}h`, 'Hours']}
+                                        contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #e2e8f0' }}
+                                        cursor={{ fill: 'rgba(99, 102, 241, 0.05)' }}
+                                    />
+                                    <Bar dataKey="hours" fill="#10B981" radius={[0, 4, 4, 0]} barSize={18}>
+                                        {timeByTaskType.map((_, i) => (
+                                            <Cell key={i} fill={DONUT_COLORS[i % DONUT_COLORS.length]} />
+                                        ))}
+                                    </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

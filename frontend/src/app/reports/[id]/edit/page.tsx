@@ -63,10 +63,19 @@ export default function EditReportPage() {
         weekStartDate: report.weekStartDate.split('T')[0],
         tasksNextWeek: report.tasksNextWeek || '',
         notesLinks: report.notesLinks || '',
-        tasks: report.tasks,
+        tasks: report.tasks.map((task) => ({
+            ...task,
+            timePlannedHrs: Number(task.timePlannedHrs),
+            timeSpentHrs: Number(task.timeSpentHrs),
+        })),
         highlights: report.highlights,
-        hoursBreakdown: report.hoursBreakdown,
+        hoursBreakdown: report.hoursBreakdown.map((entry) => ({
+            ...entry,
+            hoursSpent: Number(entry.hoursSpent),
+        })),
     };
+
+    const isNeedsCorrection = report.status === 'NEEDS_CORRECTION';
 
     const activeVersionComment = report.reviewComments?.[0];
 
@@ -100,7 +109,7 @@ export default function EditReportPage() {
                                 </div>
                             </div>
                         )}
-                        <ReportForm initialData={initialData} onSave={handleSave} saveLabel="Save Changes" />
+                        <ReportForm initialData={initialData} onSave={handleSave} saveLabel="Save Changes" clearable={isNeedsCorrection} />
                     </main>
                 </div>
             </div>
