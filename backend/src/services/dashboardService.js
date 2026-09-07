@@ -160,11 +160,13 @@ async function getWorkloadByProject(weekStartDate) {
 
 // --- Time spent by task type, team-wide ---
 async function getTimeByTaskType(weekStartDate) {
+    const taskTypes = ['Development', 'Meetings', 'Planning', 'Testing', 'Documentation'];
     let where = {};
     if (weekStartDate) {
         const weekStart = startOfWeek(weekStartDate);
         where = { report: { weekStartDate: { gte: weekStart, lt: addDays(weekStart, 7) } } };
     }
+    where.taskCategory = { in: taskTypes };
 
     const grouped = await prisma.hoursBreakdown.groupBy({
         by: ['taskCategory'],

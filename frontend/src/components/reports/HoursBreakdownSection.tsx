@@ -1,4 +1,5 @@
 'use client';
+import { useState } from 'react';
 import { HoursBreakdownEntry } from '@/types/report';
 
 type Props = {
@@ -11,6 +12,7 @@ const TASK_TYPES = ['Development', 'Meetings', 'Planning', 'Testing', 'Documenta
 const inputCls = 'rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 text-sm px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition placeholder-slate-400 dark:placeholder-slate-500';
 
 export default function HoursBreakdownSection({ entries, onChange }: Props) {
+    const [customCategory, setCustomCategory] = useState('');
     const quickCategories = TASK_TYPES;
 
     function addRow(category = '') {
@@ -24,6 +26,13 @@ export default function HoursBreakdownSection({ entries, onChange }: Props) {
         const updated = [...entries];
         updated[index] = { ...updated[index], [field]: value };
         onChange(updated);
+    }
+
+    function addCustomCategory() {
+        const category = customCategory.trim();
+        if (!category || entries.some((entry) => entry.taskCategory.toLowerCase() === category.toLowerCase())) return;
+        addRow(category);
+        setCustomCategory('');
     }
 
     const totalHours = entries.reduce((sum, e) => sum + (Number(e.hoursSpent) || 0), 0);
@@ -53,6 +62,22 @@ export default function HoursBreakdownSection({ entries, onChange }: Props) {
                         </button>
                     );
                 })}
+                <input
+                    type="text"
+                    value={customCategory}
+                    onChange={(e) => setCustomCategory(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && addCustomCategory()}
+                    placeholder="New category"
+                    className={`${inputCls} w-32`}
+                />
+                <button
+                    type="button"
+                    onClick={addCustomCategory}
+                    disabled={!customCategory.trim()}
+                    className="text-xs font-medium rounded-full px-3 py-1 border border-indigo-200 dark:border-indigo-700 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 disabled:opacity-50 disabled:cursor-default"
+                >
+                    + Add
+                </button>
             </div>
 
             {/* Entry rows */}

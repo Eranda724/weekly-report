@@ -165,6 +165,10 @@ async function main() {
     const weekSep3  = new Date('2026-09-03T00:00:00.000Z');
     const weekSep1  = new Date('2026-09-01T00:00:00.000Z');
     const weekAug31 = new Date('2026-08-31T00:00:00.000Z');
+    const weekAug26 = new Date('2026-08-26T00:00:00.000Z');
+    const weekAug24 = new Date('2026-08-24T00:00:00.000Z');
+    const weekAug22 = new Date('2026-08-22T00:00:00.000Z');
+    const weekAug21 = new Date('2026-08-21T00:00:00.000Z');
 
     const reportsToSeed = [
         // --- 1. Test User in spring1 (User Reference Report) ---
@@ -1633,6 +1637,230 @@ async function main() {
                 { taskCategory: 'Planning', hoursSpent: 2.0 },
             ],
             reviewComment: null,
+        },
+
+        // =====================================================================
+        // WEEK: Aug 26, 2026  (1 report — Saman, spring1, APPROVED)
+        // =====================================================================
+        {
+            userId: memberSaman.id,
+            projectId: projectSpring1.id,
+            weekStartDate: weekAug26,
+            status: 'APPROVED',
+            currentVersion: 1,
+            tasksNextWeek: 'Begin drafting ER diagram and define database entities with the team',
+            notesLinks: 'https://github.com/company/repo',
+            tasks: [
+                {
+                    taskName: 'Review project requirements document',
+                    priority: 'HIGH',
+                    plannedPct: 100,
+                    actualPct: 100,
+                    status: 'COMPLETED',
+                    timePlannedHrs: 2,
+                    timeSpentHrs: 2,
+                    deliverable: 'Requirements reviewed and clarifying questions sent to manager',
+                },
+                {
+                    taskName: 'Set up local development environment',
+                    priority: 'HIGH',
+                    plannedPct: 100,
+                    actualPct: 100,
+                    status: 'COMPLETED',
+                    timePlannedHrs: 3,
+                    timeSpentHrs: 2.5,
+                    deliverable: 'Node.js, PostgreSQL and VS Code fully configured locally',
+                },
+            ],
+            highlights: [
+                { itemType: 'ACHIEVEMENT', description: 'Dev environment ready on first day of the project', isKeyItem: true },
+                { itemType: 'ACHIEVEMENT', description: 'Requirements fully understood before any coding started', isKeyItem: false },
+            ],
+            hoursBreakdown: [
+                { taskCategory: 'Planning', hoursSpent: 2.0 },
+                { taskCategory: 'Development', hoursSpent: 2.5 },
+            ],
+            reviewComment: {
+                managerId: managerEranda.id,
+                decision: 'APPROVED',
+                commentText: 'Great preparation before writing any code. Clean setup.',
+            },
+        },
+
+        // =====================================================================
+        // WEEK: Aug 24, 2026  (1 report — Ishan, spring1, APPROVED)
+        // =====================================================================
+        {
+            userId: memberIshan.id,
+            projectId: projectSpring1.id,
+            weekStartDate: weekAug24,
+            status: 'APPROVED',
+            currentVersion: 1,
+            tasksNextWeek: 'Research Next.js 14 app router and start project scaffolding',
+            notesLinks: 'https://nextjs.org/docs',
+            tasks: [
+                {
+                    taskName: 'Onboard to team communication channels and tools',
+                    priority: 'HIGH',
+                    plannedPct: 100,
+                    actualPct: 100,
+                    status: 'COMPLETED',
+                    timePlannedHrs: 1,
+                    timeSpentHrs: 1,
+                    deliverable: 'Joined Slack, GitHub org, and Notion workspace',
+                },
+                {
+                    taskName: 'Read through existing Next.js 14 migration guide',
+                    priority: 'MEDIUM',
+                    plannedPct: 100,
+                    actualPct: 100,
+                    status: 'COMPLETED',
+                    timePlannedHrs: 3,
+                    timeSpentHrs: 3.5,
+                    deliverable: 'Summary notes on app router vs pages router differences',
+                },
+                {
+                    taskName: 'Create proof-of-concept with Next.js 14 server components',
+                    priority: 'MEDIUM',
+                    plannedPct: 100,
+                    actualPct: 100,
+                    status: 'COMPLETED',
+                    timePlannedHrs: 3,
+                    timeSpentHrs: 2.5,
+                    deliverable: 'Simple POC app demonstrating server and client component split',
+                },
+            ],
+            highlights: [
+                { itemType: 'ACHIEVEMENT', description: 'Built and understood server component hydration model', isKeyItem: true },
+                { itemType: 'ACHIEVEMENT', description: 'Onboarding completed same day without blockers', isKeyItem: false },
+            ],
+            hoursBreakdown: [
+                { taskCategory: 'Research', hoursSpent: 3.5 },
+                { taskCategory: 'Development', hoursSpent: 2.5 },
+                { taskCategory: 'Planning', hoursSpent: 1.0 },
+            ],
+            reviewComment: {
+                managerId: managerSarah.id,
+                decision: 'APPROVED',
+                commentText: 'Thorough research before starting. The POC demonstrates clear understanding.',
+            },
+        },
+
+        // =====================================================================
+        // WEEK: Aug 22, 2026  (1 report — Thilina, spring1, APPROVED)
+        // =====================================================================
+        {
+            userId: memberThilina.id,
+            projectId: projectSpring1.id,
+            weekStartDate: weekAug22,
+            status: 'APPROVED',
+            currentVersion: 1,
+            tasksNextWeek: 'Attend project kickoff and take ownership of UI/UX design',
+            notesLinks: 'https://figma.com',
+            tasks: [
+                {
+                    taskName: 'Complete team onboarding and tool access setup',
+                    priority: 'HIGH',
+                    plannedPct: 100,
+                    actualPct: 100,
+                    status: 'COMPLETED',
+                    timePlannedHrs: 1,
+                    timeSpentHrs: 1,
+                    deliverable: 'Access to GitHub, Figma, Slack and project Notion confirmed',
+                },
+                {
+                    taskName: 'Study the project scope document and UI requirements',
+                    priority: 'HIGH',
+                    plannedPct: 100,
+                    actualPct: 100,
+                    status: 'COMPLETED',
+                    timePlannedHrs: 2,
+                    timeSpentHrs: 2,
+                    deliverable: 'Annotated scope doc with UI questions for manager',
+                },
+                {
+                    taskName: 'Explore Tailwind CSS and modern dashboard design references',
+                    priority: 'MEDIUM',
+                    plannedPct: 100,
+                    actualPct: 100,
+                    status: 'COMPLETED',
+                    timePlannedHrs: 3,
+                    timeSpentHrs: 3,
+                    deliverable: 'Mood board with 15 reference dashboards saved in Figma',
+                },
+            ],
+            highlights: [
+                { itemType: 'ACHIEVEMENT', description: 'Strong visual reference board ready before design sprint', isKeyItem: true },
+                { itemType: 'ACHIEVEMENT', description: 'UI scope questions answered by manager same day', isKeyItem: false },
+            ],
+            hoursBreakdown: [
+                { taskCategory: 'Research', hoursSpent: 3.0 },
+                { taskCategory: 'Planning', hoursSpent: 3.0 },
+            ],
+            reviewComment: {
+                managerId: managerEranda.id,
+                decision: 'APPROVED',
+                commentText: 'Great initiative on the reference board. This will speed up design decisions.',
+            },
+        },
+
+        // =====================================================================
+        // WEEK: Aug 21, 2026  (1 report — Pasidu, spring1, APPROVED)
+        // =====================================================================
+        {
+            userId: memberPasidu.id,
+            projectId: projectSpring1.id,
+            weekStartDate: weekAug21,
+            status: 'APPROVED',
+            currentVersion: 1,
+            tasksNextWeek: 'Configure GitHub Actions CI workflow and set up Docker Compose',
+            notesLinks: 'https://docs.github.com/en/actions',
+            tasks: [
+                {
+                    taskName: 'Team onboarding and access provisioning',
+                    priority: 'HIGH',
+                    plannedPct: 100,
+                    actualPct: 100,
+                    status: 'COMPLETED',
+                    timePlannedHrs: 1,
+                    timeSpentHrs: 1,
+                    deliverable: 'Access to GitHub, Slack, Notion and CI tools granted',
+                },
+                {
+                    taskName: 'Research GitHub Actions YAML syntax and best practices',
+                    priority: 'HIGH',
+                    plannedPct: 100,
+                    actualPct: 100,
+                    status: 'COMPLETED',
+                    timePlannedHrs: 3,
+                    timeSpentHrs: 2.5,
+                    deliverable: 'Notes on Node.js CI workflow patterns and reusable actions',
+                },
+                {
+                    taskName: 'Install and test Docker Desktop on local machine',
+                    priority: 'MEDIUM',
+                    plannedPct: 100,
+                    actualPct: 100,
+                    status: 'COMPLETED',
+                    timePlannedHrs: 2,
+                    timeSpentHrs: 1.5,
+                    deliverable: 'Docker running locally, hello-world container verified',
+                },
+            ],
+            highlights: [
+                { itemType: 'ACHIEVEMENT', description: 'Docker and GitHub Actions both understood before sprint started', isKeyItem: true },
+                { itemType: 'ACHIEVEMENT', description: 'CI/CD plan drafted and shared with team for review', isKeyItem: false },
+            ],
+            hoursBreakdown: [
+                { taskCategory: 'Research', hoursSpent: 2.5 },
+                { taskCategory: 'DevOps', hoursSpent: 1.5 },
+                { taskCategory: 'Planning', hoursSpent: 1.0 },
+            ],
+            reviewComment: {
+                managerId: managerTest.id,
+                decision: 'APPROVED',
+                commentText: 'Solid pre-sprint preparation. CI plan is well thought out.',
+            },
         },
     ];
 
