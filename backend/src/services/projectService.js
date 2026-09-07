@@ -2,7 +2,7 @@ const prisma = require('../config/prisma');
 
 async function getAllProjects(user) {
     const where = { isActive: true };
-    if (user && user.role !== 'ADMIN') {
+    if (user && user.role === 'TEAM_MEMBER') {
         where.projectMembers = {
             some: {
                 userId: user.id
@@ -37,11 +37,9 @@ async function updateProject(id, { name }) {
 }
 
 async function deleteProject(id) {
-    // Soft delete — keeps history intact for reports that reference it
-    return prisma.project.update({
-        where: { id },
-        data: { isActive: false },
-    });
+    // Remove all project members first, then hard-delete the project
+    await prisma.projectMember.deleteMany({ where: { projectId: id } });
+    return prisma.project.delete({ where: { id } });
 }
 
 async function addProjectMember(projectId, userId) {
