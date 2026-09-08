@@ -32,6 +32,8 @@ export default function DashboardOverviewPage() {
                             Clear
                         </button>
                     )}
+                    <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1" />
+                    <AIChatWidget weekStartDate={weekStartDate || undefined} />
                 </div>
             </div>
 
@@ -39,8 +41,6 @@ export default function DashboardOverviewPage() {
             <div className="px-6 py-6 space-y-6">
                 <DashboardInsights weekStartDate={weekStartDate || undefined} />
             </div>
-            
-            <AIChatWidget weekStartDate={weekStartDate || undefined} />
         </ProtectedRoute>
     );
 }

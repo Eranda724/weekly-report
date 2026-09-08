@@ -209,7 +209,7 @@ export default function UserManagementContent() {
                     {/* Sticky Header */}
                     <div className="sticky top-0 z-10 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 shadow-sm px-6 h-16 flex items-center justify-between gap-4 shrink-0">
                         <h1 className="font-bold text-slate-800 dark:text-slate-100 text-sm tracking-wide uppercase whitespace-nowrap">
-                            Organization
+                            Projects and Teams
                         </h1>
                     </div>
 
@@ -310,145 +310,145 @@ export default function UserManagementContent() {
                                             <div className="p-6">
                                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                                     {projects.map(project => (
-                                                <div key={project.id} className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 hover:shadow-md transition-shadow">
-                                                    <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-start bg-gradient-to-r from-slate-50/50 to-white dark:from-slate-800/50 dark:to-slate-900">
-                                                        <div>
-                                                            {editingProjectId === project.id ? (
-                                                                <div className="flex items-center gap-2">
-                                                                    <input
-                                                                        value={editingProjectName}
-                                                                        onChange={(e) => setEditingProjectName(e.target.value)}
-                                                                        className="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg px-2 py-1 text-sm text-slate-900 dark:text-slate-100"
-                                                                        autoFocus
-                                                                    />
-                                                                    <button onClick={() => handleUpdateProject(project.id)} disabled={busyId === `edit-${project.id}`} className="text-xs text-indigo-600 font-semibold bg-transparent border-none cursor-pointer">Save</button>
-                                                                    <button onClick={() => setEditingProjectId(null)} className="text-xs text-slate-500 bg-transparent border-none cursor-pointer">Cancel</button>
+                                                        <div key={project.id} className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 hover:shadow-md transition-shadow">
+                                                            <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-start bg-gradient-to-r from-slate-50/50 to-white dark:from-slate-800/50 dark:to-slate-900">
+                                                                <div>
+                                                                    {editingProjectId === project.id ? (
+                                                                        <div className="flex items-center gap-2">
+                                                                            <input
+                                                                                value={editingProjectName}
+                                                                                onChange={(e) => setEditingProjectName(e.target.value)}
+                                                                                className="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg px-2 py-1 text-sm text-slate-900 dark:text-slate-100"
+                                                                                autoFocus
+                                                                            />
+                                                                            <button onClick={() => handleUpdateProject(project.id)} disabled={busyId === `edit-${project.id}`} className="text-xs text-indigo-600 font-semibold bg-transparent border-none cursor-pointer">Save</button>
+                                                                            <button onClick={() => setEditingProjectId(null)} className="text-xs text-slate-500 bg-transparent border-none cursor-pointer">Cancel</button>
+                                                                        </div>
+                                                                    ) : (
+                                                                        <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">{project.name}</h3>
+                                                                    )}
+                                                                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{project.projectMembers?.length || 0} members</p>
                                                                 </div>
-                                                            ) : (
-                                                                <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100">{project.name}</h3>
-                                                            )}
-                                                            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{project.projectMembers?.length || 0} members</p>
-                                                        </div>
-                                                        <div className="flex items-center gap-1">
-                                                            <button
-                                                                onClick={() => { setEditingProjectId(project.id); setEditingProjectName(project.name); }}
-                                                                className="text-slate-400 hover:text-indigo-500 bg-transparent border-none cursor-pointer p-1.5 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors"
-                                                                title="Edit Project"
-                                                            >
-                                                                Edit
-                                                            </button>
-                                                            <button
-                                                                onClick={() => handleDeleteTeam(project.id)}
-                                                                disabled={busyId === `del-${project.id}`}
-                                                                className="text-slate-400 hover:text-red-500 bg-transparent border-none cursor-pointer p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                                                                title="Delete Team"
-                                                            >
-                                                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                    <div className="p-6">
-                                                        <div className="mb-4">
-                                                            <h4 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">Members</h4>
-                                                            <ul className="space-y-3">
-                                                                {project.projectMembers?.map(member => (
-                                                                    <li key={member.user.id} className="flex items-center justify-between group">
-                                                                        <div className="flex items-center gap-3">
-                                                                            <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-300 font-semibold text-xs border border-slate-200 dark:border-slate-700">
-                                                                                {member.user.name.charAt(0).toUpperCase()}
-                                                                            </div>
-                                                                            <div>
-                                                                                <p className="text-sm font-medium text-slate-900 dark:text-slate-200">{member.user.name}</p>
-                                                                                <p className="text-xs text-slate-500 dark:text-slate-400">{roleLabels[member.user.role]}</p>
-                                                                            </div>
-                                                                        </div>
-                                                                        {!(user?.role === 'MANAGER' && member.user.role !== 'TEAM_MEMBER') && (
-                                                                            <button
-                                                                                onClick={() => handleRemoveMember(project.id, member.user.id)}
-                                                                                disabled={busyId === `rem-${project.id}-${member.user.id}`}
-                                                                                className="text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100 p-1 bg-transparent border-none cursor-pointer"
-                                                                                title="Remove from team"
-                                                                            >
-                                                                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                                                                            </button>
-                                                                        )}
-                                                                    </li>
-                                                                ))}
-                                                                {(!project.projectMembers || project.projectMembers.length === 0) && (
-                                                                    <li className="text-sm text-slate-400 dark:text-slate-500 italic">No members in this team yet.</li>
-                                                                )}
-                                                            </ul>
-                                                        </div>
-
-                                                        {(() => {
-                                                            const availableUsers = users.filter(u => u.isActive && u.role !== 'ADMIN' && !project.projectMembers?.find(m => m.user.id === u.id));
-                                                            return (
-                                                                <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2">
-                                                                    <div className="relative flex-1">
-                                                                        <div
-                                                                            className={`w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-700 dark:text-slate-300 focus:ring-2 focus:ring-indigo-500 outline-none flex justify-between items-center ${availableUsers.length === 0 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-                                                                            onClick={() => {
-                                                                                if (availableUsers.length > 0) {
-                                                                                    setOpenDropdownId(openDropdownId === project.id ? null : project.id);
-                                                                                }
-                                                                            }}
-                                                                        >
-                                                                            <span className="truncate">
-                                                                                {(() => {
-                                                                                    const selectedUser = users.find(u => u.id === selectedUsers[project.id]);
-                                                                                    return selectedUser
-                                                                                        ? `${selectedUser.name} (${selectedUser.email})`
-                                                                                        : (availableUsers.length === 0 ? 'All users added' : 'Select user to add...');
-                                                                                })()}
-                                                                            </span>
-                                                                            <div className="flex items-center flex-shrink-0">
-                                                                                {(() => {
-                                                                                    const selectedUser = users.find(u => u.id === selectedUsers[project.id]);
-                                                                                    return selectedUser && (
-                                                                                        <span className="text-xs font-medium px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 mr-2">
-                                                                                            {roleLabels[selectedUser.role] || selectedUser.role}
-                                                                                        </span>
-                                                                                    );
-                                                                                })()}
-                                                                                <svg className="w-4 h-4 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-                                                                            </div>
-                                                                        </div>
-
-                                                                        {openDropdownId === project.id && availableUsers.length > 0 && (
-                                                                            <div className="absolute z-20 w-full mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md shadow-lg max-h-60 overflow-auto">
-                                                                                {availableUsers.map(u => (
-                                                                                    <div
-                                                                                        key={u.id}
-                                                                                        className="flex justify-between items-center px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer text-sm"
-                                                                                        onClick={() => {
-                                                                                            setSelectedUsers({ ...selectedUsers, [project.id]: u.id });
-                                                                                            setOpenDropdownId(null);
-                                                                                        }}
-                                                                                    >
-                                                                                        <span className="text-slate-700 dark:text-slate-300 truncate mr-2">{u.name} <span className="text-slate-400">({u.email})</span></span>
-                                                                                        <span className="text-xs font-medium px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-900 text-slate-500 dark:text-slate-400 flex-shrink-0">
-                                                                                            {roleLabels[u.role] || u.role}
-                                                                                        </span>
-                                                                                    </div>
-                                                                                ))}
-                                                                            </div>
-                                                                        )}
-                                                                    </div>
+                                                                <div className="flex items-center gap-1">
                                                                     <button
-                                                                        onClick={() => handleAddMember(project.id)}
-                                                                        disabled={!selectedUsers[project.id] || busyId === `add-${project.id}` || availableUsers.length === 0}
-                                                                        className={`font-medium px-4 py-2 rounded-lg text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed border-none cursor-pointer ${selectedUsers[project.id]
-                                                                            ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm'
-                                                                            : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-                                                                            }`}
+                                                                        onClick={() => { setEditingProjectId(project.id); setEditingProjectName(project.name); }}
+                                                                        className="text-slate-400 hover:text-indigo-500 bg-transparent border-none cursor-pointer p-1.5 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors"
+                                                                        title="Edit Project"
                                                                     >
-                                                                        Add
+                                                                        Edit
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => handleDeleteTeam(project.id)}
+                                                                        disabled={busyId === `del-${project.id}`}
+                                                                        className="text-slate-400 hover:text-red-500 bg-transparent border-none cursor-pointer p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                                                                        title="Delete Team"
+                                                                    >
+                                                                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                                                                     </button>
                                                                 </div>
-                                                            );
-                                                        })()}
-                                                    </div>
-                                                </div>
+                                                            </div>
+                                                            <div className="p-6">
+                                                                <div className="mb-4">
+                                                                    <h4 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">Members</h4>
+                                                                    <ul className="space-y-3">
+                                                                        {project.projectMembers?.map(member => (
+                                                                            <li key={member.user.id} className="flex items-center justify-between group">
+                                                                                <div className="flex items-center gap-3">
+                                                                                    <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-300 font-semibold text-xs border border-slate-200 dark:border-slate-700">
+                                                                                        {member.user.name.charAt(0).toUpperCase()}
+                                                                                    </div>
+                                                                                    <div>
+                                                                                        <p className="text-sm font-medium text-slate-900 dark:text-slate-200">{member.user.name}</p>
+                                                                                        <p className="text-xs text-slate-500 dark:text-slate-400">{roleLabels[member.user.role]}</p>
+                                                                                    </div>
+                                                                                </div>
+                                                                                {!(user?.role === 'MANAGER' && member.user.role !== 'TEAM_MEMBER') && (
+                                                                                    <button
+                                                                                        onClick={() => handleRemoveMember(project.id, member.user.id)}
+                                                                                        disabled={busyId === `rem-${project.id}-${member.user.id}`}
+                                                                                        className="text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100 p-1 bg-transparent border-none cursor-pointer"
+                                                                                        title="Remove from team"
+                                                                                    >
+                                                                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                                                                                    </button>
+                                                                                )}
+                                                                            </li>
+                                                                        ))}
+                                                                        {(!project.projectMembers || project.projectMembers.length === 0) && (
+                                                                            <li className="text-sm text-slate-400 dark:text-slate-500 italic">No members in this team yet.</li>
+                                                                        )}
+                                                                    </ul>
+                                                                </div>
+
+                                                                {(() => {
+                                                                    const availableUsers = users.filter(u => u.isActive && u.role !== 'ADMIN' && !project.projectMembers?.find(m => m.user.id === u.id));
+                                                                    return (
+                                                                        <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2">
+                                                                            <div className="relative flex-1">
+                                                                                <div
+                                                                                    className={`w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-700 dark:text-slate-300 focus:ring-2 focus:ring-indigo-500 outline-none flex justify-between items-center ${availableUsers.length === 0 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                                                                                    onClick={() => {
+                                                                                        if (availableUsers.length > 0) {
+                                                                                            setOpenDropdownId(openDropdownId === project.id ? null : project.id);
+                                                                                        }
+                                                                                    }}
+                                                                                >
+                                                                                    <span className="truncate">
+                                                                                        {(() => {
+                                                                                            const selectedUser = users.find(u => u.id === selectedUsers[project.id]);
+                                                                                            return selectedUser
+                                                                                                ? `${selectedUser.name} (${selectedUser.email})`
+                                                                                                : (availableUsers.length === 0 ? 'All users added' : 'Select user to add...');
+                                                                                        })()}
+                                                                                    </span>
+                                                                                    <div className="flex items-center flex-shrink-0">
+                                                                                        {(() => {
+                                                                                            const selectedUser = users.find(u => u.id === selectedUsers[project.id]);
+                                                                                            return selectedUser && (
+                                                                                                <span className="text-xs font-medium px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 mr-2">
+                                                                                                    {roleLabels[selectedUser.role] || selectedUser.role}
+                                                                                                </span>
+                                                                                            );
+                                                                                        })()}
+                                                                                        <svg className="w-4 h-4 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                                                                                    </div>
+                                                                                </div>
+
+                                                                                {openDropdownId === project.id && availableUsers.length > 0 && (
+                                                                                    <div className="absolute z-20 w-full mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md shadow-lg max-h-60 overflow-auto">
+                                                                                        {availableUsers.map(u => (
+                                                                                            <div
+                                                                                                key={u.id}
+                                                                                                className="flex justify-between items-center px-3 py-2 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer text-sm"
+                                                                                                onClick={() => {
+                                                                                                    setSelectedUsers({ ...selectedUsers, [project.id]: u.id });
+                                                                                                    setOpenDropdownId(null);
+                                                                                                }}
+                                                                                            >
+                                                                                                <span className="text-slate-700 dark:text-slate-300 truncate mr-2">{u.name} <span className="text-slate-400">({u.email})</span></span>
+                                                                                                <span className="text-xs font-medium px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-900 text-slate-500 dark:text-slate-400 flex-shrink-0">
+                                                                                                    {roleLabels[u.role] || u.role}
+                                                                                                </span>
+                                                                                            </div>
+                                                                                        ))}
+                                                                                    </div>
+                                                                                )}
+                                                                            </div>
+                                                                            <button
+                                                                                onClick={() => handleAddMember(project.id)}
+                                                                                disabled={!selectedUsers[project.id] || busyId === `add-${project.id}` || availableUsers.length === 0}
+                                                                                className={`font-medium px-4 py-2 rounded-lg text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed border-none cursor-pointer ${selectedUsers[project.id]
+                                                                                    ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm'
+                                                                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                                                                                    }`}
+                                                                            >
+                                                                                Add
+                                                                            </button>
+                                                                        </div>
+                                                                    );
+                                                                })()}
+                                                            </div>
+                                                        </div>
                                                     ))}
                                                 </div>
                                             </div>

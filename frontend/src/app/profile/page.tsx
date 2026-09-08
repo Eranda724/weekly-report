@@ -7,6 +7,7 @@ import ManagerSidebar from '@/components/ManagerSidebar';
 import { useAuth } from '@/context/AuthContext';
 import { reportsApi, managerReportsApi } from '@/lib/api';
 import { Report, ReportStatus } from '@/types/report';
+import AIChatWidget from '@/components/AIChatWidget';
 
 const STATUS_CONFIG: Record<ReportStatus, { label: string; cls: string }> = {
     DRAFT: { label: 'Draft', cls: 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300' },
@@ -62,6 +63,7 @@ export default function ProfilePage() {
                         <h1 className="font-bold text-slate-800 dark:text-slate-100 text-sm tracking-wide uppercase whitespace-nowrap">
                             My Profile
                         </h1>
+                        <AIChatWidget />
                     </div>
 
                     <main className="flex-1 overflow-y-auto px-8 pt-8 pb-12 space-y-6 bg-slate-50 dark:bg-slate-950">

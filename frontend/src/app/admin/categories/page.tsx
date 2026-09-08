@@ -74,29 +74,55 @@ export default function CategoryManagementPage() {
 
     return (
         <ProtectedRoute allowedRoles={['MANAGER', 'ADMIN']}>
-            <div className="flex min-h-screen bg-slate-50 dark:bg-slate-950">
+            <div className="flex h-screen bg-slate-50 dark:bg-slate-950 overflow-hidden">
                 <ManagerSidebar />
-                <main className="ml-60 flex-1 p-8">
-                    <div className="max-w-3xl">
-                        <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Category Management</h1>
-                        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Manage categories available on weekly reports.</p>
-                        {error && <p className="mt-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
-                        <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-                            <form onSubmit={create} className="flex gap-3">
-                                <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Category name" required className="flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-950 dark:text-white" />
-                                <button type="submit" disabled={busy} className="rounded-lg border-none bg-indigo-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50">Add Category</button>
-                            </form>
-                            <div className="mt-6 divide-y divide-slate-100 dark:divide-slate-800">
-                                {loading ? <p className="py-4 text-sm text-slate-500">Loading...</p> : categories.length === 0 ? <p className="py-4 text-sm text-slate-500">No categories yet.</p> : categories.map((category) => (
-                                    <div key={category.id} className="flex items-center gap-3 py-4">
-                                        {editingId === category.id ? <input value={editingName} onChange={(e) => setEditingName(e.target.value)} autoFocus className="flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-950 dark:text-white" /> : <span className="flex-1 text-sm font-medium text-slate-800 dark:text-slate-200">{category.name}</span>}
-                                        {editingId === category.id ? <><button onClick={() => update(category.id)} disabled={busy} className="border-none bg-transparent text-sm font-medium text-indigo-600">Save</button><button onClick={() => setEditingId(null)} className="border-none bg-transparent text-sm text-slate-500">Cancel</button></> : <><button onClick={() => { setEditingId(category.id); setEditingName(category.name); }} className="border-none bg-transparent text-sm font-medium text-indigo-600">Edit</button><button onClick={() => remove(category.id)} disabled={busy} className="border-none bg-transparent text-sm font-medium text-red-600">Delete</button></>}
-                                    </div>
-                                ))}
-                            </div>
-                        </section>
+                <div className="flex-1 ml-60 flex flex-col overflow-hidden">
+                    <div className="sticky top-0 z-10 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 shadow-sm px-6 h-16 flex items-center justify-between gap-4 shrink-0">
+                        <h1 className="font-bold text-slate-800 dark:text-slate-100 text-sm tracking-wide uppercase whitespace-nowrap">
+                            Categories
+                        </h1>
                     </div>
-                </main>
+                    <main className="flex-1 overflow-y-auto p-8 bg-slate-50 dark:bg-slate-950">
+                        {error && (
+                            <div className="mb-6 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-300 rounded-lg p-4 text-sm flex items-start">
+                                <svg className="w-5 h-5 mr-3 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                {error}
+                            </div>
+                        )}
+                        <div className="animate-in fade-in duration-300 slide-in-from-bottom-2">
+                            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+                                <div className="p-6 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
+                                    <form onSubmit={create} className="flex gap-3 max-w-xl">
+                                        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="New category name" required className="flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                                        <button type="submit" disabled={busy} className="rounded-lg border-none bg-indigo-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-50 cursor-pointer hover:bg-indigo-700 transition-colors">Add Category</button>
+                                    </form>
+                                </div>
+                                <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                                    {loading ? <p className="p-6 text-sm text-slate-500">Loading...</p> : categories.length === 0 ? <p className="p-6 text-sm text-slate-500">No categories yet.</p> : categories.map((category) => (
+                                        <div key={category.id} className="flex items-center justify-between p-6 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                                            {editingId === category.id ? (
+                                                <div className="flex items-center gap-3 flex-1 max-w-xl">
+                                                    <input value={editingName} onChange={(e) => setEditingName(e.target.value)} autoFocus className="flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                                                    <button onClick={() => update(category.id)} disabled={busy} className="bg-transparent border-none text-sm font-medium text-indigo-600 cursor-pointer hover:text-indigo-700">Save</button>
+                                                    <button onClick={() => setEditingId(null)} className="bg-transparent border-none text-sm text-slate-500 cursor-pointer hover:text-slate-700">Cancel</button>
+                                                </div>
+                                            ) : (
+                                                <span className="text-sm font-medium text-slate-800 dark:text-slate-200">{category.name}</span>
+                                            )}
+                                            
+                                            {editingId !== category.id && (
+                                                <div className="flex items-center gap-4">
+                                                    <button onClick={() => { setEditingId(category.id); setEditingName(category.name); }} className="bg-transparent border-none text-sm font-medium text-indigo-600 cursor-pointer hover:text-indigo-700">Edit</button>
+                                                    <button onClick={() => remove(category.id)} disabled={busy} className="bg-transparent border-none text-sm font-medium text-red-600 cursor-pointer hover:text-red-700 disabled:opacity-50">Delete</button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                </div>
             </div>
         </ProtectedRoute>
     );

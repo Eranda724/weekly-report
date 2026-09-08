@@ -4,6 +4,7 @@ import Link from 'next/link';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { reportsApi } from '@/lib/api';
 import { Report, ReportStatus } from '@/types/report';
+import AIChatWidget from '@/components/AIChatWidget';
 
 /* ─── Status config ────────────────────────────────── */
 const STATUS_CONFIG: Record<ReportStatus, { label: string; className: string }> = {
@@ -79,17 +80,21 @@ export default function ReportHistoryPage() {
             <div className="min-h-screen">
 
                 {/* Page header */}
-                <div className="flex items-center justify-between px-6 pt-8 pb-2">
+                <div className="sticky top-0 z-10 border-b border-slate-200 bg-white/95 px-6 py-4 shadow-sm backdrop-blur dark:border-slate-700 dark:bg-slate-800/95 flex items-center justify-between">
                     <div>
-                        <h1 className="text-xl font-bold text-slate-800 dark:text-slate-100">My Reports</h1>
+                        <h1 className="text-sm font-bold uppercase tracking-wide text-slate-800 dark:text-slate-100">My Reports</h1>
                         <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">View and manage your weekly reports</p>
                     </div>
-                    <Link
-                        href="/reports/new"
-                        className="bg-gradient-to-r from-indigo-500 to-violet-600 hover:from-indigo-600 hover:to-violet-700 text-white text-sm font-semibold px-4 py-2 rounded-lg shadow-md shadow-indigo-200 dark:shadow-indigo-900/30 transition-all duration-150 no-underline"
-                    >
-                        New Report
-                    </Link>
+                    <div className="flex items-center gap-3">
+                        <AIChatWidget />
+                        <div className="w-px h-6 bg-slate-200 dark:bg-slate-700 hidden sm:block" />
+                        <Link
+                            href="/reports/new"
+                            className="bg-gradient-to-r from-indigo-500 to-violet-600 hover:from-indigo-600 hover:to-violet-700 text-white text-sm font-semibold px-4 py-2 rounded-lg shadow-md shadow-indigo-200 dark:shadow-indigo-900/30 transition-all duration-150 no-underline whitespace-nowrap"
+                        >
+                            New Report
+                        </Link>
+                    </div>
                 </div>
 
                 <main className="px-6 py-4">

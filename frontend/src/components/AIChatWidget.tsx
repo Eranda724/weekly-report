@@ -1,16 +1,26 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { aiApi } from '@/lib/api';
+import { useAuth } from '@/context/AuthContext';
 
 type Message = { role: 'user' | 'assistant'; text: string };
 
 export default function AIChatWidget({ weekStartDate }: { weekStartDate?: string }) {
+    const { user } = useAuth();
+    const isManager = user?.role === 'MANAGER' || user?.role === 'ADMIN';
+
     const [open, setOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
     const [summaryLoading, setSummaryLoading] = useState(false);
     const bottomRef = useRef<HTMLDivElement>(null);
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     useEffect(() => {
         bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -49,22 +59,29 @@ export default function AIChatWidget({ weekStartDate }: { weekStartDate?: string
         return (
             <button
                 onClick={() => setOpen(true)}
-                className="fixed bottom-6 right-6 z-50 bg-violet-600 hover:bg-violet-500 text-white rounded-full px-5 py-2.5 shadow-lg shadow-violet-900/30 text-sm font-semibold transition-all flex items-center gap-2 border border-violet-500 cursor-pointer"
+                className="bg-violet-50 text-violet-600 hover:bg-violet-100 dark:bg-violet-900/20 dark:text-violet-400 dark:hover:bg-violet-900/40 px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2 cursor-pointer border border-violet-200 dark:border-violet-800"
             >
-                <img src="/assets/robot.png" alt="AI" className="w-8 h-8" />
+                <img src="/assets/robot.png" alt="AI" className="w-5 h-5" />
                 Ask AI
             </button>
         );
     }
 
-    return (
-        <div className="fixed bottom-6 right-6 z-50 w-96 h-[520px] bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-700/60 rounded-2xl shadow-2xl shadow-black/20 flex flex-col overflow-hidden">
+    if (!mounted || typeof document === 'undefined') return null;
+
+    return createPortal(
+        <>
+            <div 
+                className="fixed inset-0 bg-slate-900/20 dark:bg-slate-900/50 z-40 backdrop-blur-sm transition-opacity" 
+                onClick={() => setOpen(false)} 
+            />
+            <div className={`fixed top-0 right-0 z-50 w-96 h-full bg-white dark:bg-[#1e293b] border-l border-slate-200 dark:border-slate-700/60 shadow-2xl flex flex-col overflow-hidden transition-transform duration-300 ease-in-out`}>
             {/* Header */}
-            <div className="flex justify-between items-center px-4 py-3 border-b border-slate-100 dark:border-slate-700/60 bg-slate-50 dark:bg-[#0f172a]/60">
+            <div className="flex justify-between items-center px-4 py-3 border-b border-slate-100 dark:border-slate-700/60 bg-slate-50 dark:bg-[#0f172a]/60 shrink-0">
                 <div className="flex items-center gap-2.5">
                     <img src="/assets/robot.png" alt="AI Avatar" className="w-9 h-9 rounded-full object-cover ring-2 ring-violet-500/40 shadow-sm" />
                     <div>
-                        <p className="font-semibold text-sm text-slate-800 dark:text-slate-100">Team AI Assistant</p>
+                        <p className="font-semibold text-sm text-slate-800 dark:text-slate-100">{isManager ? 'Team AI Assistant' : 'My Work AI Assistant'}</p>
                         <p className="text-[0.65rem] text-slate-400 dark:text-slate-500 leading-none">Powered by AI</p>
                     </div>
                 </div>
@@ -82,7 +99,9 @@ export default function AIChatWidget({ weekStartDate }: { weekStartDate?: string
                     <div className="flex flex-col items-center justify-center h-full gap-3 text-center pb-4">
                         <img src="/assets/robot.png" alt="AI" className="w-16 h-16 rounded-full object-cover ring-4 ring-violet-500/20 shadow-lg" />
                         <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">
-                            Ask about team activity<br />or generate a weekly summary.
+                            {isManager 
+                                ? <>Ask about team activity<br />or generate a weekly summary.</>
+                                : <>Ask about your work<br />or summarize your week.</>}
                         </p>
                     </div>
                 )}
@@ -124,7 +143,7 @@ export default function AIChatWidget({ weekStartDate }: { weekStartDate?: string
                     disabled={summaryLoading}
                     className="w-full text-xs bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 hover:text-violet-600 dark:hover:text-violet-400 rounded-xl px-3 py-2 disabled:opacity-50 transition-colors font-medium cursor-pointer"
                 >
-                    ✨ Generate Weekly Team Summary
+                    ✨ {isManager ? 'Generate Weekly Team Summary' : 'Generate My Weekly Summary'}
                 </button>
                 <form onSubmit={handleSend} className="flex gap-2">
                     <input
@@ -144,6 +163,8 @@ export default function AIChatWidget({ weekStartDate }: { weekStartDate?: string
                 </form>
             </div>
         </div>
+        </>,
+        document.body
     );
 }
 
