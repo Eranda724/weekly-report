@@ -29,8 +29,12 @@ export default function LoginPage() {
 
       <form onSubmit={handleSubmit} className="relative w-full max-w-md bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl border border-white/40 dark:border-slate-700/60 p-8 sm:p-10 rounded-[2rem] shadow-2xl space-y-6">
         <div className="text-center space-y-2 mb-8">
-          <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-500/30">
-            <span className="text-white text-xl">✨</span>
+          <div className="w-16 h-16 bg-white/80 dark:bg-slate-900/50 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-500/20 ring-1 ring-indigo-100 dark:ring-slate-700 overflow-hidden">
+            <img
+              src="/assets/logo.jpg"
+              alt="Company logo"
+              className="h-full w-full object-contain p-2"
+            />
           </div>
           <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">Welcome Back</h1>
           <p className="text-sm text-slate-500 dark:text-slate-400">Sign in to your account to continue</p>
