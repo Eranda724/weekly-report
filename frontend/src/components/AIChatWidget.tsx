@@ -6,6 +6,13 @@ import { useAuth } from '@/context/AuthContext';
 
 type Message = { role: 'user' | 'assistant'; text: string };
 
+function normalizeAiText(text: string) {
+    return String(text || '')
+        .replace(/\*\*(.+?)\*\*/g, '$1')
+        .replace(/__(.+?)__/g, '$1')
+        .trim();
+}
+
 export default function AIChatWidget({ weekStartDate }: { weekStartDate?: string }) {
     const { user } = useAuth();
     const isManager = user?.role === 'MANAGER' || user?.role === 'ADMIN';
@@ -35,7 +42,7 @@ export default function AIChatWidget({ weekStartDate }: { weekStartDate?: string
         setLoading(true);
         try {
             const res = await aiApi.chat(question);
-            setMessages((prev) => [...prev, { role: 'assistant', text: res.answer }]);
+            setMessages((prev) => [...prev, { role: 'assistant', text: normalizeAiText(res.answer) }]);
         } catch (err: any) {
             setMessages((prev) => [...prev, { role: 'assistant', text: `Error: ${err.message}` }]);
         } finally {
@@ -47,7 +54,7 @@ export default function AIChatWidget({ weekStartDate }: { weekStartDate?: string
         setSummaryLoading(true);
         try {
             const res = await aiApi.getSummary(weekStartDate);
-            setMessages((prev) => [...prev, { role: 'assistant', text: res.summary }]);
+            setMessages((prev) => [...prev, { role: 'assistant', text: normalizeAiText(res.summary) }]);
         } catch (err: any) {
             setMessages((prev) => [...prev, { role: 'assistant', text: `Error: ${err.message}` }]);
         } finally {

@@ -54,6 +54,12 @@ async function askQuestion(question, user) {
         prompt = `You are an assistant helping a manager understand their team's weekly reports.
 Answer the manager's question using ONLY the data below. If the data doesn't contain the answer, say so honestly rather than guessing.
 
+Important formatting rules:
+- Use plain text only, no markdown, no bold, no headings, and no HTML.
+- Do not use **bold** or __bold__ syntax.
+- Keep the response readable in a simple chat UI.
+- If you need emphasis, use plain asterisks as literal text, for example: *Status: APPROVED*
+
 TEAM DATA:
 ${context}
 
@@ -61,6 +67,12 @@ MANAGER'S QUESTION: ${question}`;
     } else {
         prompt = `You are an assistant helping a team member reflect on their own work and write their weekly reports.
 Answer the team member's question using ONLY their data below. Help them describe blockers or achievements if they ask. If the data doesn't contain the answer, say so honestly rather than guessing.
+
+Important formatting rules:
+- Use plain text only, no markdown, no bold, no headings, and no HTML.
+- Do not use **bold** or __bold__ syntax.
+- Keep the response readable in a simple chat UI.
+- If you need emphasis, use plain asterisks as literal text, for example: *Status: APPROVED*
 
 MY DATA:
 ${context}
@@ -83,6 +95,12 @@ Based on the data below, write a concise summary covering:
 2. Any recurring blockers or challenges
 3. Any signs of workload imbalance (some people overloaded, others light)
 
+Formatting rules:
+- Use plain text only, no markdown, no bold, no headings, and no HTML.
+- Do not use **bold** or __bold__ syntax.
+- Keep it readable in a simple chat UI.
+- If you need emphasis, use plain asterisks like *Status: APPROVED*.
+
 Keep it to 3-4 short paragraphs, plain language, no headers needed.
 
 TEAM DATA:
@@ -93,6 +111,12 @@ Based on your data below, write a concise summary of your work this week:
 1. Key tasks completed
 2. Any blockers or challenges faced
 3. Key achievements
+
+Formatting rules:
+- Use plain text only, no markdown, no bold, no headings, and no HTML.
+- Do not use **bold** or __bold__ syntax.
+- Keep it readable in a simple chat UI.
+- If you need emphasis, use plain asterisks like *Status: APPROVED*.
 
 Keep it to 2-3 short paragraphs, plain language, no headers needed.
 
